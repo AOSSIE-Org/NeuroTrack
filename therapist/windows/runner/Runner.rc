@@ -89,11 +89,11 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "org.aossie.neurotrack" "\0"
+            VALUE "CompanyName", "org.aossie.neurotrack.therapist" "\0"
             VALUE "FileDescription", "therapist" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "therapist" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 org.aossie.neurotrack. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 org.aossie.neurotrack.therapist. All rights reserved." "\0"
             VALUE "OriginalFilename", "therapist.exe" "\0"
             VALUE "ProductName", "therapist" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

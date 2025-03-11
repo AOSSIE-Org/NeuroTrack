@@ -8,7 +8,7 @@
 PRODUCT_NAME = therapist
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = org.aossie.neurotrack.therapist
+PRODUCT_BUNDLE_IDENTIFIER = org.aossie.neurotrack.therapist.therapist
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 org.aossie.neurotrack. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 org.aossie.neurotrack.therapist. All rights reserved.

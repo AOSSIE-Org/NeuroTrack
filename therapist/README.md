@@ -1,6 +1,6 @@
 # therapist
 
-A new Flutter project.
+Therapist app for NeuroTrack
 
 ## Getting Started
 
