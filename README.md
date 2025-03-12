@@ -14,14 +14,9 @@ Neurotrack aims to:
 - Track therapy progress using data-driven approaches
 - Empower patients/caregivers to actively participate in the therapy process
 
-## Technical Infrastructure
-
-The platform consists of:
-
-1. Patient/Client Mobile Application
-2. Therapist Professional Application
-3. Backend services powered by Supabase/Appwrite
-4. AI assessment and recommendation (via LLMs)
+## Tech Stack
+- Flutter (for both the Apps)
+- Supabase (for backend)
 
 ## Patient Application Flow
 
