@@ -9,6 +9,7 @@ import 'package:patient/Features/home/presentation/views/therapy_goal.dart';
 
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
