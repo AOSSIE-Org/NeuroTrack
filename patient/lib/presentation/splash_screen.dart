@@ -15,10 +15,12 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => AuthScreen()),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+        MaterialPageRoute(builder: (context) => const AuthScreen()),
+        );
+      }
     });
   }
 

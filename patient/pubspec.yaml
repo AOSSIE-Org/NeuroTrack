@@ -52,6 +52,7 @@ dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+  country_picker: ^2.0.27
 
 dev_dependencies:
   flutter_test:

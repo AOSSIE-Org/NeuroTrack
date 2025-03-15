@@ -103,11 +103,11 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
 
                 // Google Sign-in Button
-                Positioned(
+                const Positioned(
                   bottom: 40,
                   left: 0,
                   right: 0,
-                  child: const GoogleSignInButton(),
+                  child: GoogleSignInButton(),
                 ),
               ],
             ),

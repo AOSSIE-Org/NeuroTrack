@@ -33,10 +33,37 @@ class AppTheme {
           color: subtitleColor,
         ),
       ),
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: primaryColor,
         secondary: secondaryColor,
-        background: backgroundColor,
+        surface: backgroundColor,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+          style: ButtonStyle(
+        backgroundColor: const WidgetStatePropertyAll(primaryColor),
+        minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 56)),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(40),
+          ),
+        ),
+      )),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: const TextStyle(
+          fontSize: 16,
+          color: Colors.black,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.grey.shade600),
+          ),
+          fillColor: Colors.yellowAccent,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.grey.shade600),
+          ),
+        ),
       ),
     );
   }
