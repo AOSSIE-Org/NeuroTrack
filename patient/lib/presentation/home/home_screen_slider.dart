@@ -31,7 +31,7 @@ class LevelIndicator extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 15),
             Row(
               children: [
                 Expanded(
@@ -71,7 +71,7 @@ class LevelIndicator extends StatelessWidget {
                             Text(
                               currentLevel.toStringAsFixed(0),
                               style: const TextStyle(
-                                fontSize: 25,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
