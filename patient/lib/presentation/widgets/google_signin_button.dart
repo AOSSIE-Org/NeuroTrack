@@ -1,8 +1,13 @@
 
 import 'package:flutter/material.dart';
+
+
+import 'package:patient/presentation/auth/personal_details_screen.dart';
+
 import 'package:patient/presentation/auth/personal_details_screen.dart';
 import 'package:patient/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+
 
 import '../auth/personal_details_screen.dart';
 
@@ -18,8 +23,9 @@ class GoogleSignInButton extends StatelessWidget {
         width: double.infinity,
         height: 50,
         child: ElevatedButton(
+
           onPressed: () => _handleGoogleSignIn(context),
-      
+
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(

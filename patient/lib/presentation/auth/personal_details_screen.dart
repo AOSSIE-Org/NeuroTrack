@@ -1,6 +1,11 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+
+import 'package:patient/presentation/assessments/assessment_screen.dart';
+import 'package:patient/presentation/assessments/assessments_list_screen.dart';
+
 import 'package:patient/presentation/home/home_screen.dart';
+
 
 class PersonalDetailsScreen extends StatefulWidget {
   const PersonalDetailsScreen({super.key});
@@ -37,6 +42,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
         child: FilledButton(
           onPressed: () {
+
             if (_formKey.currentState?.validate() ?? false) {
               String userName = isAssessmentForChild
                   ? childNameController.text
@@ -54,6 +60,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 ),
               );
             }
+
           },
           child: const Text(
             'Continue',
