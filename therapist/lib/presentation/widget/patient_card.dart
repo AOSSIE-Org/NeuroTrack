@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../patients/patients_screen.dart';
 
 class PatientCard extends StatelessWidget {
   final String name;
@@ -7,7 +8,7 @@ class PatientCard extends StatelessWidget {
   final String email;
   final String package;
   final String duration;
-  final String imagePath; 
+  final String imagePath;
 
   const PatientCard({
     super.key,
@@ -165,7 +166,17 @@ class PatientCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<Widget>(
+                  builder: (BuildContext context) => PatientsScreen(
+                    patientName: name,
+                    patientId: id,
+                    patientUrl: imagePath,
+                  ),
+                ),
+              );
+            },
             child: const Text(
               'View or Manage Patient',
               style: TextStyle(
