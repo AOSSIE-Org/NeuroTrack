@@ -11,13 +11,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/result/result.dart';
 
-
 enum AuthNavigationStatus {
   unknown,
   home,
   personalDetails,
   error,
 }
+
 extension AuthNavigationStatusX on AuthNavigationStatus {
   bool get isUnknown => this == AuthNavigationStatus.unknown;
   bool get isHome => this == AuthNavigationStatus.home;
@@ -26,16 +26,15 @@ extension AuthNavigationStatusX on AuthNavigationStatus {
 }
 
 class AuthProvider extends ChangeNotifier {
-
   AuthProvider({
     required AuthRepository authRepository,
-  }): _authRepository = authRepository;
+  }) : _authRepository = authRepository;
 
   final AuthRepository _authRepository;
 
   ApiStatus _apiStatus = ApiStatus.initial;
   ApiStatus get apiStatus => _apiStatus;
-  
+
   String _apiErrorMessage = '';
   String get apiErrorMessage => _apiErrorMessage;
 
@@ -52,6 +51,7 @@ class AuthProvider extends ChangeNotifier {
         await _handleMobileSignIn();
       }
     } catch (error) {
+      debugPrint('Sign-in failed: $error');
       throw Exception('Sign in failed: $error');
     }
   }
@@ -69,9 +69,9 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _handleMobileSignIn() async {
     final webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID'] ??
-        (throw Exception("WEB_CLIENT_ID not found in .env"));
+        (throw Exception("GOOGLE_WEB_CLIENT_ID not found in .env"));
     final iosClientId = dotenv.env['GOOGLE_IOS_CLIENT_ID'];
-    
+
     final GoogleSignIn googleSignIn = GoogleSignIn(
       clientId: Platform.isIOS ? iosClientId : null,
       serverClientId: webClientId,
@@ -81,7 +81,7 @@ class AuthProvider extends ChangeNotifier {
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser == null) throw 'Sign in cancelled';
 
-    final GoogleSignInAuthentication googleAuth = 
+    final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
 
     if (googleAuth.idToken == null) throw 'No ID Token found';
@@ -96,37 +96,70 @@ class AuthProvider extends ChangeNotifier {
 
   String? getFullName() {
     final session = supabase.auth.currentSession;
-    if (session == null) return null;
+
+    if (session == null) {
+      debugPrint('User not authenticated');
+      return null;
+    }
+
+    debugPrint('Access Token: ${session.accessToken}');
+
     return session.user.userMetadata?['full_name'] ?? 'User';
   }
 
   Future<void> checkIfPatientExists() async {
-    final ActionResult result = await _authRepository.checkIfPatientExists();
     _authNavigationStatus = AuthNavigationStatus.unknown;
     notifyListeners();
-    if(result is ActionResultSuccess) {
+
+    final ActionResult result = await _authRepository.checkIfPatientExists();
+
+    if (result is ActionResultSuccess) {
       final bool patientExists = result.data as bool;
-      if(patientExists) {
-        _authNavigationStatus = AuthNavigationStatus.home;
-      } else {
-        _authNavigationStatus = AuthNavigationStatus.personalDetails;
-      }
+      _authNavigationStatus = patientExists
+          ? AuthNavigationStatus.home
+          : AuthNavigationStatus.personalDetails;
     } else {
+      debugPrint('Error checking patient existence: ${result.errorMessage}');
       _authNavigationStatus = AuthNavigationStatus.error;
     }
     notifyListeners();
   }
 
   void storePatientPersonalInfo(PersonalInfoModel personalInfoModel) async {
-    _apiStatus = ApiStatus.initial;
-    _apiErrorMessage = '';
-    notifyListeners();
-    final ActionResult result = await _authRepository.storePersonalInfo(personalInfoModel.toEntity());
-    if(result is ActionResultSuccess) {
-      _apiStatus = ApiStatus.success;
-    } else {
+    try {
+      _apiStatus = ApiStatus.initial;
+      _apiErrorMessage = '';
+      notifyListeners();
+
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        debugPrint('User not authenticated');
+        _apiErrorMessage = 'User not authenticated. Please log in again.';
+        _apiStatus = ApiStatus.failure;
+        notifyListeners();
+        return;
+      }
+
+      // Debugging API request details
+      debugPrint('Sending Patient Info: ${personalInfoModel.toEntity()}');
+      debugPrint('Access Token: ${supabase.auth.currentSession?.accessToken}');
+
+      final ActionResult result =
+          await _authRepository.storePersonalInfo(personalInfoModel.toEntity());
+
+      if (result is ActionResultSuccess) {
+        _apiStatus = ApiStatus.success;
+      } else {
+        debugPrint('API Error: ${result.errorMessage}');
+        _apiStatus = ApiStatus.failure;
+        _apiErrorMessage =
+            result.errorMessage ?? 'An error occurred. Please try again.';
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Unexpected Error: $e');
+      debugPrint('Stack Trace: $stackTrace');
       _apiStatus = ApiStatus.failure;
-      _apiErrorMessage = result.errorMessage ?? 'An error occurred. Please try again.';
+      _apiErrorMessage = 'Something went wrong. Please try again later.';
     }
     notifyListeners();
   }
