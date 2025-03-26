@@ -1,13 +1,20 @@
 -- Create patient table if it does not exist
 CREATE TABLE IF NOT EXISTS public.patient (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  full_name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT now(),
+  patient_id UUID DEFAULT gen_random_uuid(),
+  patient_name TEXT NOT NULL,
+  age INT NOT NULL,
+  is_adult BOOLEAN NOT NULL,
+  phone_no TEXT NOT NULL,
+  email TEXT NOT NULL,
+  guardian_name TEXT,
+  guardian_relation TEXT,
+  gender TEXT,
+  country TEXT,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE
 );
 
--- Enable Row-Level Security (RLS) on the table
+-- Enable Row-Level Security (RLS) AFTER the table exists
 ALTER TABLE public.patient ENABLE ROW LEVEL SECURITY;
 
 -- Allow authenticated users to read their own data
