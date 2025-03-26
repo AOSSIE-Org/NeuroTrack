@@ -1,7 +1,6 @@
 -- Create patient table if it does not exist
 CREATE TABLE IF NOT EXISTS public.patient (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  patient_id UUID DEFAULT gen_random_uuid(),
+  patient_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   patient_name TEXT NOT NULL,
   age INT NOT NULL,
   is_adult BOOLEAN NOT NULL,
