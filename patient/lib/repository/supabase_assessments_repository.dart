@@ -12,13 +12,14 @@ class SupabaseAssessmentsRepository implements AssessmentsRepository {
 
   @override
   Future<List<Map<String, dynamic>>> fetchAssessmentById(String id) async {
+    print('Fetching assessment with id: $id');
     final response = await _supabase
         .from('assessments')
         .select('*')
         .eq('id', id)
         .limit(1)
         .maybeSingle();
-
+print('Response: $response');
     return response != null ? [response] : [];
   }
 

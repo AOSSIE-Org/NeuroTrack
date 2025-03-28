@@ -1,11 +1,20 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+
+
+import 'package:patient/presentation/assessments/assessment_screen.dart';
+import 'package:patient/presentation/assessments/assessments_list_screen.dart';
+
+import 'package:patient/presentation/home/home_screen.dart';
+
 import 'package:patient/core/core.dart';
 import 'package:patient/model/auth_models/personal_info_model.dart';
 import 'package:patient/presentation/assessments/assessments_list_screen.dart';
 import 'package:patient/presentation/widgets/snackbar_service.dart';
 import 'package:patient/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+
+
 
 class PersonalDetailsScreen extends StatefulWidget {
   const PersonalDetailsScreen({super.key});
@@ -99,11 +108,13 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
         child: FilledButton(
           onPressed: () {
+
             if (_formKey.currentState?.validate() ?? false) {
               final personalInfoModel = getPersonalInfo;
               final authProvider = context.read<AuthProvider>();
               authProvider.storePatientPersonalInfo(personalInfoModel);
             }
+
           },
           child: const Text(
             'Continue',

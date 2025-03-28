@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  percent_indicator: ^4.2.3
 
   #state management  
   provider: ^6.1.2

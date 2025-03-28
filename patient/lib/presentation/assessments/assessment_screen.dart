@@ -5,6 +5,8 @@ import 'package:patient/model/assessment_models/assessment_models.dart';
 import 'package:patient/presentation/widgets/snackbar_service.dart';
 import 'package:patient/provider/assessment_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:patient/presentation/result/result.dart';
+
 
 class AssessmentScreen extends StatefulWidget {
   const AssessmentScreen({
@@ -103,7 +105,9 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
+
                           context.read<AssessmentProvider>().submitAssessment();
+
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.secondaryColor,
@@ -134,7 +138,6 @@ class AssessmentScreenState extends State<AssessmentScreen> {
   }
 }
 
-// Reusable QuestionCard Widget with Custom Checkbox
 class QuestionCard extends StatelessWidget {
   final AssessmentQuestionModel question;
   final int questionIndex;
@@ -149,6 +152,7 @@ class QuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -191,20 +195,23 @@ class QuestionCard extends StatelessWidget {
                   side: const BorderSide(
                     color: Color(0xFF666666),
                     width: 1.5,
+
                   ),
-                ),
-                Text(
-                  optionText,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.subtitleColor,
+                  Expanded(
+                    child: Text(
+                      optionText,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppTheme.subtitleColor,
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        }),
-      ],
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 }
