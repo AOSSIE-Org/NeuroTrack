@@ -260,6 +260,15 @@ class HomeContent extends StatelessWidget {
   Widget _buildConsultationRequestSection(BuildContext context) {
     return Consumer<ConsultationProvider>(
       builder: (context, provider, _) {
+        // Check if provider is initialized and has data
+        if (provider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        if (provider.error != null) {
+          return Text('Error: ${provider.error}');
+        }
+        
         if (provider.pendingRequests.isEmpty) {
           return const SizedBox.shrink(); // Don't show section if no pending requests
         }

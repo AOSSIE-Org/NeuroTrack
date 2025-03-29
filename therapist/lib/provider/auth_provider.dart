@@ -1,76 +1,146 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:io' show Platform;
+import 'package:therapist/core/entities/auth_entities/therapist_personal_info_entity.dart';
+import 'package:therapist/core/repository/auth/auth_repository.dart';
+import 'package:therapist/core/result/result.dart';
+import 'package:therapist/presentation/auth/personal_details_screen.dart';
+import 'package:therapist/presentation/home/home_screen.dart';
+import 'package:supabase/supabase.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final supabase = Supabase.instance.client;
-  bool _isAuthenticated = false;
+  final AuthRepository _authRepository;
+  final SupabaseClient _supabaseClient;
 
+  AuthProvider({
+    required AuthRepository authRepository,
+    required SupabaseClient supabaseClient,
+  }) : _authRepository = authRepository,
+       _supabaseClient = supabaseClient;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  String _errorMessage = '';
+  String get errorMessage => _errorMessage;
+
+  bool _isAuthenticated = false;
   bool get isAuthenticated => _isAuthenticated;
 
-  void login() {
-    _isAuthenticated = true;
+  String? _userId;
+  String? get userId => _userId;
+
+  String? _userEmail;
+  String? get userEmail => _userEmail;
+
+  late String _userName;
+  String get userName => _userName;
+
+  bool _isNewUser = true;
+  bool get isNewUser => _isNewUser;
+
+  Future<bool> signInWithGoogle() async {
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final result = await _authRepository.signInWithGoogle();
+
+      if (result is ActionResultSuccess) {
+        _isAuthenticated = true;
+        _userId = await _authRepository.getUserId();
+        
+        final userData = result.data as Map<String, dynamic>;
+        _userEmail = userData['email'];
+        _userName = userData['name'];
+        _isNewUser = userData['is_new_user'] ?? true; // Store if user is new
+        
+        _errorMessage = '';
+      } else if (result is ActionResultFailure) {
+        _errorMessage = result.errorMessage!;
+        _isAuthenticated = false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isAuthenticated = false;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return _isAuthenticated;
+  }
+
+  Future<bool> storePersonalInfo(TherapistPersonalInfoEntity personalInfoEntity) async {
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    final result = await _authRepository.storePersonalInfo(personalInfoEntity);
+
+    bool success = false;
+    
+    if (result is ActionResultSuccess) {
+      success = true;
+    } else if (result is ActionResultFailure) {
+      _errorMessage = result.errorMessage!;
+      success = false;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return success;
+  }
+
+  Future<void> checkAuthentication() async {
+    _userId = await _authRepository.getUserId();
+    _isAuthenticated = _userId != null;
     notifyListeners();
   }
 
-  Future<void> signInWithGoogle() async {
-    try {
-      if (kIsWeb) {
-        await _handleWebSignIn();
-      } else {
-        await _handleMobileSignIn();
-      }
-      _isAuthenticated = true;
-      notifyListeners();
-    } catch (error) {
-      throw Exception('Sign in failed: $error');
+  Future<bool> checkIfUserIsNew() async {
+    if (_userId == null) {
+      return true; 
     }
-  }
-
-  Future<void> _handleWebSignIn() async {
-    final supabaseUrl = dotenv.env['SUPABASE_URL'] ??
-        (throw Exception("Supabase URL not found in .env"));
-
-    await supabase.auth.signInWithOAuth(
-      OAuthProvider.google,
-      redirectTo: "$supabaseUrl/auth/v1/callback",
-      authScreenLaunchMode: LaunchMode.platformDefault,
-    );
-  }
-
-  Future<void> _handleMobileSignIn() async {
-    final webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID'] ??
-        (throw Exception("WEB_CLIENT_ID not found in .env"));
-    final iosClientId = dotenv.env['GOOGLE_IOS_CLIENT_ID'];
     
-    final GoogleSignIn googleSignIn = GoogleSignIn(
-      clientId: Platform.isIOS ? iosClientId : null,
-      serverClientId: webClientId,
-      scopes: ['email', 'profile'],
-    );
-
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser == null) throw 'Sign in cancelled';
-
-    final GoogleSignInAuthentication googleAuth = 
-        await googleUser.authentication;
-
-    if (googleAuth.idToken == null) throw 'No ID Token found';
-    if (googleAuth.accessToken == null) throw 'No Access Token found';
-
-    await supabase.auth.signInWithIdToken(
-      provider: OAuthProvider.google,
-      idToken: googleAuth.idToken!,
-      accessToken: googleAuth.accessToken,
-    );
+    _isLoading = true;
+    notifyListeners();
+    
+    try {
+      final result = await _authRepository.checkIfUserIsNew(_userId!);
+      
+      if (result is ActionResultSuccess) {
+        final data = result.data as Map<String, dynamic>;
+        _isNewUser = data['is_new_user'] ?? true;
+      } else if (result is ActionResultFailure) {
+        _errorMessage = result.errorMessage!;
+        _isNewUser = true;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isNewUser = true;
+    }
+    
+    _isLoading = false;
+    notifyListeners();
+    return _isNewUser;
   }
 
-  String? getFullName() {
-    final session = supabase.auth.currentSession;
-    if (session == null) return null;
-    return session.user.userMetadata?['full_name'] ?? 'User';
+  Map<String, dynamic>? getUserMetadata() {
+    return _supabaseClient.auth.currentSession?.user.userMetadata;
+  }
+
+  void navigateBasedOnUserStatus(BuildContext context) {
+    if (_isNewUser) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const PersonalDetailsScreen(),
+        ),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+      );
+    }
   }
 }

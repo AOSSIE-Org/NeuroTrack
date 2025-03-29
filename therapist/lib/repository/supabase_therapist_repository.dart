@@ -1,9 +1,8 @@
-
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:therapist/core/entities/therapist_entities/therapist_patient_details_entity.dart';
 import 'package:therapist/core/entities/therapist_entities/therapist_schedule_entity.dart';
 import 'package:therapist/core/entities/therapist_entities/therapist_upcoming_appointment_entity.dart';
+import 'package:therapist/core/models/profession_model.dart';
 
 import '../core/repository/repository.dart';
 import '../core/result/result.dart';
@@ -93,6 +92,108 @@ class SupabaseTherapistRepository implements TherapistRepository {
     throw UnimplementedError();
   }
 
+  @override
+  Future<ActionResult> fetchProfessions() async {
+    try {
+      final response = await _supabaseClient.from('profession').select('*');
+      
+      final data = response.map((item) => ProfessionModel.fromMap(item)).toList();
+      
+      return ActionResultSuccess(data: data, statusCode: 200);
+    } catch (e) {
+      return ActionResultFailure(errorMessage: e.toString(), statusCode: 400);
+    }
+  }
+@override
+Future<ActionResult> fetchRegulatoryBodies(int professionId) async {
+  try {
+    final response = await _supabaseClient
+        .from('profession_details')
+        .select('id, profession_id, regulatory_body')
+        .eq('profession_id', professionId);
+    
+    // Transform data after retrieving it
+    final Set<String> uniqueBodies = {};
+    List<RegulatoryBodyModel> data = [];
+    
+    for (var item in response) {
+      final body = item['regulatory_body'] as String;
+      if (!uniqueBodies.contains(body)) {
+        uniqueBodies.add(body);
+        data.add(RegulatoryBodyModel.fromMap({
+          'id': item['id'],
+          'profession_id': item['profession_id'],
+          'name': body,
+        }));
+      }
+    }
+    
+    return ActionResultSuccess(data: data, statusCode: 200);
+  } catch (e) {
+    print('Error fetching regulatory bodies: $e');
+    return ActionResultFailure(errorMessage: e.toString(), statusCode: 400);
+  }
+}
 
+@override
+Future<ActionResult> fetchSpecializations(int professionId) async {
+  try {
+    final response = await _supabaseClient
+        .from('profession_details')
+        .select('id, profession_id, specialization')
+        .eq('profession_id', professionId);
+    
+    // Transform data after retrieving it
+    final Set<String> uniqueSpecs = {};
+    List<SpecializationModel> data = [];
+    
+    for (var item in response) {
+      final spec = item['specialization'] as String;
+      if (!uniqueSpecs.contains(spec)) {
+        uniqueSpecs.add(spec);
+        data.add(SpecializationModel.fromMap({
+          'id': item['id'],
+          'profession_id': item['profession_id'],
+          'name': spec,
+        }));
+      }
+    }
+    
+    return ActionResultSuccess(data: data, statusCode: 200);
+  } catch (e) {
+    print('Error fetching specializations: $e');
+    return ActionResultFailure(errorMessage: e.toString(), statusCode: 400);
+  }
+}
 
+@override
+Future<ActionResult> fetchTherapies(int professionId) async {
+  try {
+    final response = await _supabaseClient
+        .from('profession_details')
+        .select('id, profession_id, therapy_offered')
+        .eq('profession_id', professionId);
+    
+    // Transform data after retrieving it
+    final Set<String> uniqueTherapies = {};
+    List<TherapyModel> data = [];
+    
+    for (var item in response) {
+      final therapy = item['therapy_offered'] as String;
+      if (!uniqueTherapies.contains(therapy)) {
+        uniqueTherapies.add(therapy);
+        data.add(TherapyModel.fromMap({
+          'id': item['id'],
+          'profession_id': item['profession_id'],
+          'name': therapy,
+        }));
+      }
+    }
+    
+    return ActionResultSuccess(data: data, statusCode: 200);
+  } catch (e) {
+    print('Error fetching therapies: $e');
+    return ActionResultFailure(errorMessage: e.toString(), statusCode: 400);
+  }
+}
 }

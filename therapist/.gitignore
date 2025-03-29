@@ -9,6 +9,7 @@
 .history
 .svn/
 migrate_working_dir/
+.env
 
 # IntelliJ related
 *.iml
@@ -46,3 +47,5 @@ app.*.map.json
 # android native build 
 
 /android/app/.cxx/Debug/2o2s201s
+/android/app/.cxx/Debug/4b4e2112/
+

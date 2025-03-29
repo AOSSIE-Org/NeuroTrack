@@ -9,6 +9,10 @@ class ConsultationProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
+  // Add a default empty list for pendingRequests
+  List<ConsultationRequestEntity> get pendingRequests => 
+    _consultationRequests.where((req) => req.status == 'pending').toList();
+
   ConsultationProvider(this._consultationRepository);
 
   List<ConsultationRequestEntity> get consultationRequests => _consultationRequests;
@@ -72,9 +76,6 @@ class ConsultationProvider extends ChangeNotifier {
   }
 
   // Filter methods for UI convenience
-  List<ConsultationRequestEntity> get pendingRequests => 
-      _consultationRequests.where((req) => req.status == 'pending').toList();
-      
   List<ConsultationRequestEntity> get acceptedRequests => 
       _consultationRequests.where((req) => req.status == 'accepted').toList();
       
