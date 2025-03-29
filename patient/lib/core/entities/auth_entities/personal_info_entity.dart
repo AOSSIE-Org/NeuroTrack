@@ -11,7 +11,7 @@ part 'personal_info_entity.mapper.dart';
 @MappableClass()
 class PersonalInfoEntity with PersonalInfoEntityMappable {
 
-  @MappableField(key: 'patient_id')
+  @MappableField(key: 'id')
   final String patientId;
 
   @MappableField(key: 'patient_name')
@@ -23,7 +23,7 @@ class PersonalInfoEntity with PersonalInfoEntityMappable {
   @MappableField(key: 'is_adult')
   final bool isAdult;
 
-  @MappableField(key: 'phone_no')
+  @MappableField(key: 'phone')
   final String phoneNo;
 
   @MappableField(key: 'email')

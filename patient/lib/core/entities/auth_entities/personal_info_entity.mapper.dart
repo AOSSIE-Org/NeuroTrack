@@ -22,7 +22,7 @@ class PersonalInfoEntityMapper extends ClassMapperBase<PersonalInfoEntity> {
 
   static String _$patientId(PersonalInfoEntity v) => v.patientId;
   static const Field<PersonalInfoEntity, String> _f$patientId =
-      Field('patientId', _$patientId, key: r'patient_id');
+      Field('patientId', _$patientId, key: r'id');
   static String _$patientName(PersonalInfoEntity v) => v.patientName;
   static const Field<PersonalInfoEntity, String> _f$patientName =
       Field('patientName', _$patientName, key: r'patient_name');
@@ -33,7 +33,7 @@ class PersonalInfoEntityMapper extends ClassMapperBase<PersonalInfoEntity> {
       Field('isAdult', _$isAdult, key: r'is_adult');
   static String _$phoneNo(PersonalInfoEntity v) => v.phoneNo;
   static const Field<PersonalInfoEntity, String> _f$phoneNo =
-      Field('phoneNo', _$phoneNo, key: r'phone_no');
+      Field('phoneNo', _$phoneNo, key: r'phone');
   static String _$email(PersonalInfoEntity v) => v.email;
   static const Field<PersonalInfoEntity, String> _f$email =
       Field('email', _$email);
