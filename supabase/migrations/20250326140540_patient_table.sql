@@ -35,3 +35,31 @@ USING (auth.uid() = user_id);
 CREATE POLICY "Allow users to delete their own data"
 ON public.patient FOR DELETE
 USING (auth.uid() = user_id);
+
+-- Create assessments table if it does not exist
+CREATE TABLE IF NOT EXISTS public.assessments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    category TEXT NOT NULL,
+    cutoff_score INT NOT NULL,
+    image_url TEXT NOT NULL
+);
+
+-- Create assessment_questions table if it does not exist
+CREATE TABLE IF NOT EXISTS public.assessment_questions (
+    question_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    assessment_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    FOREIGN KEY (assessment_id) REFERENCES assessments(id) ON DELETE CASCADE
+);
+
+-- Create assessment_options table if it does not exist
+CREATE TABLE IF NOT EXISTS public.assessment_options (
+    option_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    question_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    score INT NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES assessment_questions(question_id) ON DELETE CASCADE
+);
