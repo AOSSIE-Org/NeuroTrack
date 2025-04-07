@@ -8,20 +8,10 @@ import 'package:patient/provider/appointments_provider.dart';
 import 'package:patient/provider/assessment_provider.dart';
 import 'package:patient/provider/auth_provider.dart';
 import 'package:patient/repository/supabase_auth_repository.dart';
-
 import 'package:patient/provider/reports_provider.dart';
-
+import 'package:patient/provider/task_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-
-
-import 'core/theme/theme.dart';
-import 'presentation/splash_screen.dart';
-import 'provider/assessment_provider.dart';
-
-import 'provider/task_provider.dart';
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,3 +63,9 @@ class MyApp extends StatelessWidget {
         home: const SplashScreen());
   }
 }
+'''a Widget Build Error related to ScaffoldMessenger.of(context) not finding a ScaffoldMessenger widget in the widget tree, often because the context used doesn’t have a Scaffold ancestor. In the code you shared, I notice the following:
+Use of ScaffoldMessengerKey
+In the MyApp widget, you’re using a GlobalKey for the ScaffoldMessenger:
+dart
+
+'''
