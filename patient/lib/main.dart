@@ -15,12 +15,24 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables from .env file
   await dotenv.load(fileName: ".env");
+
+  // Validate that Supabase credentials are present
+  final supabaseUrl = dotenv.env['SUPABASE_URL'];
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+  if (supabaseUrl == null || supabaseAnonKey == null) {
+    throw Exception('Supabase URL or Anon Key missing in .env file');
+  }
+
+  // Initialize Supabase
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
+  // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.white,
@@ -43,7 +55,7 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider(create: (_) => ReportsProvider()),
         ChangeNotifierProvider(create: (_) => TaskProvider()),
-        ChangeNotifierProvider(create: (_) => AppointmentsProvider())
+        ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
       ],
       child: const MyApp(),
     ),
@@ -56,16 +68,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        scaffoldMessengerKey: SnackbarService.scaffoldMessengerKey,
-        debugShowCheckedModeBanner: false,
-        title: 'Patient App',
-        theme: AppTheme.lightTheme(),
-        home: const SplashScreen());
+      scaffoldMessengerKey: SnackbarService.scaffoldMessengerKey, // Global key for SnackBar
+      debugShowCheckedModeBanner: false,
+      title: 'Patient App',
+      theme: AppTheme.lightTheme(),
+      home: const SplashScreen(),
+      // Define named routes if needed (e.g., for navigation after onboarding)
+      routes: {
+        '/home': (context) => const Placeholder(), // Replace with actual home screen
+        '/login': (context) => const Placeholder(), // Replace with actual login screen
+      },
+    );
   }
 }
-'''a Widget Build Error related to ScaffoldMessenger.of(context) not finding a ScaffoldMessenger widget in the widget tree, often because the context used doesn’t have a Scaffold ancestor. In the code you shared, I notice the following:
-Use of ScaffoldMessengerKey
-In the MyApp widget, you’re using a GlobalKey for the ScaffoldMessenger:
-dart
-
-'''
