@@ -193,6 +193,10 @@ Replace placeholders with actual values from **Supabase** and **Google Cloud Con
     - Professional certifications
     - Background verification
 - Admin approval process before full platform access
+### Troubleshooting
+- **Flutter run fails with "Supabase not initialized"**: Ensure `.env` file exists in `patient/` and `therapist/` with correct `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+- **Google OAuth redirect fails**: Double-check the redirect URI in Google Cloud Console matches `https://your-project-id.supabase.co/auth/v1/callback`.
+- **Dependencies not found**: Run `flutter pub get` in both `patient/` and `therapist/` directories.
 
 ### Patient Management
 
