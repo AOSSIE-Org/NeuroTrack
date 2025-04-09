@@ -40,7 +40,7 @@ class SupabaseAuthRepository implements AuthRepository {
     try {
       final response = await _supabaseClient.from('patient')
         .select('*')
-        .eq('id', _supabaseClient.auth.currentUser!.id)
+        .eq('patient_id', _supabaseClient.auth.currentUser!.id)
         .maybeSingle();
       
       if(response != null) {
