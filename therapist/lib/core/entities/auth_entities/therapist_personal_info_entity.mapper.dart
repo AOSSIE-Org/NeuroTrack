@@ -22,9 +22,9 @@ class TherapistPersonalInfoEntityMapper
   @override
   final String id = 'TherapistPersonalInfoEntity';
 
-  static String? _$id(TherapistPersonalInfoEntity v) => v.id;
+  static String _$id(TherapistPersonalInfoEntity v) => v.id;
   static const Field<TherapistPersonalInfoEntity, String> _f$id =
-      Field('id', _$id, opt: true);
+      Field('id', _$id);
   static String _$name(TherapistPersonalInfoEntity v) => v.name;
   static const Field<TherapistPersonalInfoEntity, String> _f$name =
       Field('name', _$name);
@@ -56,6 +56,18 @@ class TherapistPersonalInfoEntityMapper
   static List<String> _$therapies(TherapistPersonalInfoEntity v) => v.therapies;
   static const Field<TherapistPersonalInfoEntity, List<String>> _f$therapies =
       Field('therapies', _$therapies);
+  static String _$startAvailabilityTime(TherapistPersonalInfoEntity v) =>
+      v.startAvailabilityTime;
+  static const Field<TherapistPersonalInfoEntity, String>
+      _f$startAvailabilityTime = Field(
+          'startAvailabilityTime', _$startAvailabilityTime,
+          key: r'start_availability_time');
+  static String _$endAvailabilityTime(TherapistPersonalInfoEntity v) =>
+      v.endAvailabilityTime;
+  static const Field<TherapistPersonalInfoEntity, String>
+      _f$endAvailabilityTime = Field(
+          'endAvailabilityTime', _$endAvailabilityTime,
+          key: r'end_availability_time');
 
   @override
   final MappableFields<TherapistPersonalInfoEntity> fields = const {
@@ -69,6 +81,8 @@ class TherapistPersonalInfoEntityMapper
     #licenseNumber: _f$licenseNumber,
     #specialization: _f$specialization,
     #therapies: _f$therapies,
+    #startAvailabilityTime: _f$startAvailabilityTime,
+    #endAvailabilityTime: _f$endAvailabilityTime,
   };
 
   static TherapistPersonalInfoEntity _instantiate(DecodingData data) {
@@ -82,7 +96,9 @@ class TherapistPersonalInfoEntityMapper
         regulatoryBody: data.dec(_f$regulatoryBody),
         licenseNumber: data.dec(_f$licenseNumber),
         specialization: data.dec(_f$specialization),
-        therapies: data.dec(_f$therapies));
+        therapies: data.dec(_f$therapies),
+        startAvailabilityTime: data.dec(_f$startAvailabilityTime),
+        endAvailabilityTime: data.dec(_f$endAvailabilityTime));
   }
 
   @override
@@ -112,7 +128,8 @@ mixin TherapistPersonalInfoEntityMappable {
 
   TherapistPersonalInfoEntityCopyWith<TherapistPersonalInfoEntity,
           TherapistPersonalInfoEntity, TherapistPersonalInfoEntity>
-      get copyWith => _TherapistPersonalInfoEntityCopyWithImpl(
+      get copyWith => _TherapistPersonalInfoEntityCopyWithImpl<
+              TherapistPersonalInfoEntity, TherapistPersonalInfoEntity>(
           this as TherapistPersonalInfoEntity, $identity, $identity);
   @override
   String toString() {
@@ -136,8 +153,8 @@ mixin TherapistPersonalInfoEntityMappable {
 extension TherapistPersonalInfoEntityValueCopy<$R, $Out>
     on ObjectCopyWith<$R, TherapistPersonalInfoEntity, $Out> {
   TherapistPersonalInfoEntityCopyWith<$R, TherapistPersonalInfoEntity, $Out>
-      get $asTherapistPersonalInfoEntity => $base
-          .as((v, t, t2) => _TherapistPersonalInfoEntityCopyWithImpl(v, t, t2));
+      get $asTherapistPersonalInfoEntity => $base.as((v, t, t2) =>
+          _TherapistPersonalInfoEntityCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class TherapistPersonalInfoEntityCopyWith<
@@ -155,7 +172,9 @@ abstract class TherapistPersonalInfoEntityCopyWith<
       String? regulatoryBody,
       String? licenseNumber,
       String? specialization,
-      List<String>? therapies});
+      List<String>? therapies,
+      String? startAvailabilityTime,
+      String? endAvailabilityTime});
   TherapistPersonalInfoEntityCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -177,7 +196,7 @@ class _TherapistPersonalInfoEntityCopyWithImpl<$R, $Out>
           (v) => call(therapies: v));
   @override
   $R call(
-          {Object? id = $none,
+          {String? id,
           String? name,
           int? age,
           String? gender,
@@ -186,9 +205,11 @@ class _TherapistPersonalInfoEntityCopyWithImpl<$R, $Out>
           String? regulatoryBody,
           String? licenseNumber,
           String? specialization,
-          List<String>? therapies}) =>
+          List<String>? therapies,
+          String? startAvailabilityTime,
+          String? endAvailabilityTime}) =>
       $apply(FieldCopyWithData({
-        if (id != $none) #id: id,
+        if (id != null) #id: id,
         if (name != null) #name: name,
         if (age != null) #age: age,
         if (gender != null) #gender: gender,
@@ -197,7 +218,11 @@ class _TherapistPersonalInfoEntityCopyWithImpl<$R, $Out>
         if (regulatoryBody != null) #regulatoryBody: regulatoryBody,
         if (licenseNumber != null) #licenseNumber: licenseNumber,
         if (specialization != null) #specialization: specialization,
-        if (therapies != null) #therapies: therapies
+        if (therapies != null) #therapies: therapies,
+        if (startAvailabilityTime != null)
+          #startAvailabilityTime: startAvailabilityTime,
+        if (endAvailabilityTime != null)
+          #endAvailabilityTime: endAvailabilityTime
       }));
   @override
   TherapistPersonalInfoEntity $make(CopyWithData data) =>
@@ -211,10 +236,15 @@ class _TherapistPersonalInfoEntityCopyWithImpl<$R, $Out>
           regulatoryBody: data.get(#regulatoryBody, or: $value.regulatoryBody),
           licenseNumber: data.get(#licenseNumber, or: $value.licenseNumber),
           specialization: data.get(#specialization, or: $value.specialization),
-          therapies: data.get(#therapies, or: $value.therapies));
+          therapies: data.get(#therapies, or: $value.therapies),
+          startAvailabilityTime: data.get(#startAvailabilityTime,
+              or: $value.startAvailabilityTime),
+          endAvailabilityTime:
+              data.get(#endAvailabilityTime, or: $value.endAvailabilityTime));
 
   @override
   TherapistPersonalInfoEntityCopyWith<$R2, TherapistPersonalInfoEntity, $Out2>
       $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _TherapistPersonalInfoEntityCopyWithImpl($value, $cast, t);
+          _TherapistPersonalInfoEntityCopyWithImpl<$R2, $Out2>(
+              $value, $cast, t);
 }

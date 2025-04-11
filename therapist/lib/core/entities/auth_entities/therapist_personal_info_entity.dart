@@ -23,6 +23,10 @@ class TherapistPersonalInfoEntity with TherapistPersonalInfoEntityMappable {
   final String specialization;
   @MappableField(key: 'therapies')
   final List<String> therapies;
+  @MappableField(key: 'start_availability_time')
+  final String startAvailabilityTime;
+  @MappableField(key: 'end_availability_time')
+  final String endAvailabilityTime;
 
   const TherapistPersonalInfoEntity({
     required this.id,
@@ -35,19 +39,7 @@ class TherapistPersonalInfoEntity with TherapistPersonalInfoEntityMappable {
     required this.licenseNumber,
     required this.specialization,
     required this.therapies,
+    required this.startAvailabilityTime,
+    required this.endAvailabilityTime,
   });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'age': age,
-      'gender': gender,
-      'profession_id': professionId,
-      'profession_name': professionName,
-      'regulatory_body': regulatoryBody,
-      'license_number': licenseNumber,
-      'specialization': specialization,
-      'therapies': therapies,
-    };
-  }
 }
