@@ -46,8 +46,8 @@ CREATE TABLE session (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     timestamp TIMESTAMPTZ NOT NULL,
-    therapist_id UUID REFERENCES therapist(id), -- Fixed to reference therapist.id
-    patient_id UUID REFERENCES patient(id),     -- Fixed to reference patient.id
+    therapist_id UUID REFERENCES therapist(id),
+    patient_id UUID REFERENCES patient(id),
     mode INT2,
     duration INT4,
     name TEXT,
@@ -59,16 +59,16 @@ CREATE TABLE therapy_goal (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     performed_on TIMESTAMPTZ,
-    therapist_id UUID REFERENCES therapist(id), -- Fixed to reference therapist.id
+    therapist_id UUID REFERENCES therapist(id), 
     therapy_mode INT2,
     duration INT4,
     therapy_type INT2,
+    therapy_type_id UUID REFERENCES therapy_type(id),
     goals JSONB,
     observations JSONB,
     regressions JSONB,
     activities JSONB,
-    patient_id UUID REFERENCES patient(id),     -- Fixed to reference patient.id
-    therapy_date INT8
+    patient_id UUID REFERENCES patient(id)
 );
 
 -- Create the assessments table
@@ -92,6 +92,46 @@ CREATE TABLE assessment_results (
   patient_id UUID REFERENCES auth.users(id),
   submission JSONB,
   result JSONB
+);
+
+-- Therapy Table 
+CREATE TABLE therapy (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    name TEXT NOT NULL UNIQUE,
+    description TEXT
+);
+
+-- Therapy Goals Master Table
+CREATE TABLE goal_master (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    goal_text TEXT NOT NULL,
+    applicable_therapies UUID[] NOT NULL
+);
+
+-- Observations Master Table
+CREATE TABLE observation_master (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    observation_text TEXT NOT NULL,
+    applicable_therapies UUID[] NOT NULL,
+);
+
+-- Regressions Master Table
+CREATE TABLE regression_master (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    regression_text TEXT NOT NULL,
+    applicable_therapies UUID[] NOT NULL
+);
+
+-- Activities Master Table
+CREATE TABLE activity_master (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    activity_text TEXT NOT NULL,
+    applicable_therapies UUID[] NOT NULL,
 );
 
 -- Indexes on foreign keys for better performance

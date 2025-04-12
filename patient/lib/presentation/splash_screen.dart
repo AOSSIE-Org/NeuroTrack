@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:patient/presentation/auth/auth_screen.dart';
 
+import '../gen/assets.gen.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -34,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/logo.png', width: 100),
+            Assets.logos.lgNeurotrack.svg(width: 100),
             const SizedBox(height: 20),
             Text(
               "Neurotrack",

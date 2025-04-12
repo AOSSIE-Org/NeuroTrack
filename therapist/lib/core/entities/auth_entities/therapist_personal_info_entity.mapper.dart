@@ -22,74 +22,67 @@ class TherapistPersonalInfoEntityMapper
   @override
   final String id = 'TherapistPersonalInfoEntity';
 
-  static String _$therapistName(TherapistPersonalInfoEntity v) =>
-      v.therapistName;
-  static const Field<TherapistPersonalInfoEntity, String> _f$therapistName =
-      Field('therapistName', _$therapistName, key: r'name');
-  static String _$email(TherapistPersonalInfoEntity v) => v.email;
-  static const Field<TherapistPersonalInfoEntity, String> _f$email =
-      Field('email', _$email);
-  static String _$phoneNo(TherapistPersonalInfoEntity v) => v.phoneNo;
-  static const Field<TherapistPersonalInfoEntity, String> _f$phoneNo =
-      Field('phoneNo', _$phoneNo, key: r'phone');
-  static bool _$approved(TherapistPersonalInfoEntity v) => v.approved;
-  static const Field<TherapistPersonalInfoEntity, bool> _f$approved =
-      Field('approved', _$approved);
-  static String? _$clinicId(TherapistPersonalInfoEntity v) => v.clinicId;
-  static const Field<TherapistPersonalInfoEntity, String> _f$clinicId =
-      Field('clinicId', _$clinicId, key: r'clinic_id', opt: true);
-  static String? _$license(TherapistPersonalInfoEntity v) => v.license;
-  static const Field<TherapistPersonalInfoEntity, String> _f$license =
-      Field('license', _$license, opt: true);
-  static String? _$specialization(TherapistPersonalInfoEntity v) =>
-      v.specialization;
-  static const Field<TherapistPersonalInfoEntity, String> _f$specialization =
-      Field('specialization', _$specialization, opt: true);
-  static String? _$gender(TherapistPersonalInfoEntity v) => v.gender;
-  static const Field<TherapistPersonalInfoEntity, String> _f$gender =
-      Field('gender', _$gender, opt: true);
-  static List<String>? _$offeredTherapies(TherapistPersonalInfoEntity v) =>
-      v.offeredTherapies;
-  static const Field<TherapistPersonalInfoEntity, List<String>>
-      _f$offeredTherapies = Field('offeredTherapies', _$offeredTherapies,
-          key: r'offered_therapies', opt: true);
-  static int? _$age(TherapistPersonalInfoEntity v) => v.age;
+  static String? _$id(TherapistPersonalInfoEntity v) => v.id;
+  static const Field<TherapistPersonalInfoEntity, String> _f$id =
+      Field('id', _$id, opt: true);
+  static String _$name(TherapistPersonalInfoEntity v) => v.name;
+  static const Field<TherapistPersonalInfoEntity, String> _f$name =
+      Field('name', _$name);
+  static int _$age(TherapistPersonalInfoEntity v) => v.age;
   static const Field<TherapistPersonalInfoEntity, int> _f$age =
-      Field('age', _$age, opt: true);
-  static String? _$regulatoryBody(TherapistPersonalInfoEntity v) =>
+      Field('age', _$age);
+  static String _$gender(TherapistPersonalInfoEntity v) => v.gender;
+  static const Field<TherapistPersonalInfoEntity, String> _f$gender =
+      Field('gender', _$gender);
+  static int _$professionId(TherapistPersonalInfoEntity v) => v.professionId;
+  static const Field<TherapistPersonalInfoEntity, int> _f$professionId =
+      Field('professionId', _$professionId, key: r'profession_id');
+  static String _$professionName(TherapistPersonalInfoEntity v) =>
+      v.professionName;
+  static const Field<TherapistPersonalInfoEntity, String> _f$professionName =
+      Field('professionName', _$professionName, key: r'profession_name');
+  static String _$regulatoryBody(TherapistPersonalInfoEntity v) =>
       v.regulatoryBody;
   static const Field<TherapistPersonalInfoEntity, String> _f$regulatoryBody =
-      Field('regulatoryBody', _$regulatoryBody,
-          key: r'regulatory_body', opt: true);
+      Field('regulatoryBody', _$regulatoryBody, key: r'regulatory_body');
+  static String _$licenseNumber(TherapistPersonalInfoEntity v) =>
+      v.licenseNumber;
+  static const Field<TherapistPersonalInfoEntity, String> _f$licenseNumber =
+      Field('licenseNumber', _$licenseNumber, key: r'license_number');
+  static String _$specialization(TherapistPersonalInfoEntity v) =>
+      v.specialization;
+  static const Field<TherapistPersonalInfoEntity, String> _f$specialization =
+      Field('specialization', _$specialization, key: r'specializations');
+  static List<String> _$therapies(TherapistPersonalInfoEntity v) => v.therapies;
+  static const Field<TherapistPersonalInfoEntity, List<String>> _f$therapies =
+      Field('therapies', _$therapies);
 
   @override
   final MappableFields<TherapistPersonalInfoEntity> fields = const {
-    #therapistName: _f$therapistName,
-    #email: _f$email,
-    #phoneNo: _f$phoneNo,
-    #approved: _f$approved,
-    #clinicId: _f$clinicId,
-    #license: _f$license,
-    #specialization: _f$specialization,
-    #gender: _f$gender,
-    #offeredTherapies: _f$offeredTherapies,
+    #id: _f$id,
+    #name: _f$name,
     #age: _f$age,
+    #gender: _f$gender,
+    #professionId: _f$professionId,
+    #professionName: _f$professionName,
     #regulatoryBody: _f$regulatoryBody,
+    #licenseNumber: _f$licenseNumber,
+    #specialization: _f$specialization,
+    #therapies: _f$therapies,
   };
 
   static TherapistPersonalInfoEntity _instantiate(DecodingData data) {
     return TherapistPersonalInfoEntity(
-        therapistName: data.dec(_f$therapistName),
-        email: data.dec(_f$email),
-        phoneNo: data.dec(_f$phoneNo),
-        approved: data.dec(_f$approved),
-        clinicId: data.dec(_f$clinicId),
-        license: data.dec(_f$license),
-        specialization: data.dec(_f$specialization),
-        gender: data.dec(_f$gender),
-        offeredTherapies: data.dec(_f$offeredTherapies),
+        id: data.dec(_f$id),
+        name: data.dec(_f$name),
         age: data.dec(_f$age),
-        regulatoryBody: data.dec(_f$regulatoryBody));
+        gender: data.dec(_f$gender),
+        professionId: data.dec(_f$professionId),
+        professionName: data.dec(_f$professionName),
+        regulatoryBody: data.dec(_f$regulatoryBody),
+        licenseNumber: data.dec(_f$licenseNumber),
+        specialization: data.dec(_f$specialization),
+        therapies: data.dec(_f$therapies));
   }
 
   @override
@@ -151,20 +144,18 @@ abstract class TherapistPersonalInfoEntityCopyWith<
     $R,
     $In extends TherapistPersonalInfoEntity,
     $Out> implements ClassCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>?
-      get offeredTherapies;
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get therapies;
   $R call(
-      {String? therapistName,
-      String? email,
-      String? phoneNo,
-      bool? approved,
-      String? clinicId,
-      String? license,
-      String? specialization,
-      String? gender,
-      List<String>? offeredTherapies,
+      {String? id,
+      String? name,
       int? age,
-      String? regulatoryBody});
+      String? gender,
+      int? professionId,
+      String? professionName,
+      String? regulatoryBody,
+      String? licenseNumber,
+      String? specialization,
+      List<String>? therapies});
   TherapistPersonalInfoEntityCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
       Then<$Out2, $R2> t);
 }
@@ -181,54 +172,46 @@ class _TherapistPersonalInfoEntityCopyWithImpl<$R, $Out>
   late final ClassMapperBase<TherapistPersonalInfoEntity> $mapper =
       TherapistPersonalInfoEntityMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>?
-      get offeredTherapies => $value.offeredTherapies != null
-          ? ListCopyWith(
-              $value.offeredTherapies!,
-              (v, t) => ObjectCopyWith(v, $identity, t),
-              (v) => call(offeredTherapies: v))
-          : null;
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get therapies =>
+      ListCopyWith($value.therapies, (v, t) => ObjectCopyWith(v, $identity, t),
+          (v) => call(therapies: v));
   @override
   $R call(
-          {String? therapistName,
-          String? email,
-          String? phoneNo,
-          bool? approved,
-          Object? clinicId = $none,
-          Object? license = $none,
-          Object? specialization = $none,
-          Object? gender = $none,
-          Object? offeredTherapies = $none,
-          Object? age = $none,
-          Object? regulatoryBody = $none}) =>
+          {Object? id = $none,
+          String? name,
+          int? age,
+          String? gender,
+          int? professionId,
+          String? professionName,
+          String? regulatoryBody,
+          String? licenseNumber,
+          String? specialization,
+          List<String>? therapies}) =>
       $apply(FieldCopyWithData({
-        if (therapistName != null) #therapistName: therapistName,
-        if (email != null) #email: email,
-        if (phoneNo != null) #phoneNo: phoneNo,
-        if (approved != null) #approved: approved,
-        if (clinicId != $none) #clinicId: clinicId,
-        if (license != $none) #license: license,
-        if (specialization != $none) #specialization: specialization,
-        if (gender != $none) #gender: gender,
-        if (offeredTherapies != $none) #offeredTherapies: offeredTherapies,
-        if (age != $none) #age: age,
-        if (regulatoryBody != $none) #regulatoryBody: regulatoryBody
+        if (id != $none) #id: id,
+        if (name != null) #name: name,
+        if (age != null) #age: age,
+        if (gender != null) #gender: gender,
+        if (professionId != null) #professionId: professionId,
+        if (professionName != null) #professionName: professionName,
+        if (regulatoryBody != null) #regulatoryBody: regulatoryBody,
+        if (licenseNumber != null) #licenseNumber: licenseNumber,
+        if (specialization != null) #specialization: specialization,
+        if (therapies != null) #therapies: therapies
       }));
   @override
   TherapistPersonalInfoEntity $make(CopyWithData data) =>
       TherapistPersonalInfoEntity(
-          therapistName: data.get(#therapistName, or: $value.therapistName),
-          email: data.get(#email, or: $value.email),
-          phoneNo: data.get(#phoneNo, or: $value.phoneNo),
-          approved: data.get(#approved, or: $value.approved),
-          clinicId: data.get(#clinicId, or: $value.clinicId),
-          license: data.get(#license, or: $value.license),
-          specialization: data.get(#specialization, or: $value.specialization),
-          gender: data.get(#gender, or: $value.gender),
-          offeredTherapies:
-              data.get(#offeredTherapies, or: $value.offeredTherapies),
+          id: data.get(#id, or: $value.id),
+          name: data.get(#name, or: $value.name),
           age: data.get(#age, or: $value.age),
-          regulatoryBody: data.get(#regulatoryBody, or: $value.regulatoryBody));
+          gender: data.get(#gender, or: $value.gender),
+          professionId: data.get(#professionId, or: $value.professionId),
+          professionName: data.get(#professionName, or: $value.professionName),
+          regulatoryBody: data.get(#regulatoryBody, or: $value.regulatoryBody),
+          licenseNumber: data.get(#licenseNumber, or: $value.licenseNumber),
+          specialization: data.get(#specialization, or: $value.specialization),
+          therapies: data.get(#therapies, or: $value.therapies));
 
   @override
   TherapistPersonalInfoEntityCopyWith<$R2, TherapistPersonalInfoEntity, $Out2>

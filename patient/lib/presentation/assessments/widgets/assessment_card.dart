@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:patient/core/theme/theme.dart';
 import 'package:patient/model/assessment_models/assessment_models.dart';
-import 'package:patient/presentation/assessments/models/assessment_card_model.dart';
 import 'package:patient/presentation/assessments/widgets/assessment_icon.dart';
 
 class AssessmentCard extends StatelessWidget {
@@ -53,7 +52,9 @@ class AssessmentCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        AssessmentIcon(icon: assessment.imageUrl,),
+                        AssessmentIcon(
+                          icon: assessment.imageUrl,
+                        ),
                       ],
                     ),
                   ],

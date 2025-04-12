@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../gen/assets.gen.dart';
+
 class ReportsProvider with ChangeNotifier {
   // Milestone Cards Data
-  final List<Map<String, dynamic>> _milestoneCards = const [
+  final List<Map<String, dynamic>> _milestoneCards = [
     {
-      'iconPath': "assets/completed_icon.png",
+      'iconPath': Assets.icons.icCompleted,
       'iconColor': Color(0xff36662C),
       'backgroundColor': Color(0xFFF5FAF4),
       'value': '2,000',
@@ -12,7 +14,7 @@ class ReportsProvider with ChangeNotifier {
       'isCompletedCard': true,
     },
     {
-      'iconPath': "assets/missed_icon.png",
+      'iconPath': Assets.icons.icMissed,
       'iconColor': Color(0xffFFA400),
       'backgroundColor': Color(0xFFFFF5E3),
       'value': '10',
@@ -20,7 +22,7 @@ class ReportsProvider with ChangeNotifier {
       'isCompletedCard': false,
     },
     {
-      'iconPath': "assets/regressed_icon.png",
+      'iconPath': Assets.icons.icRegressed,
       'iconColor': Color(0xffFF3939),
       'backgroundColor': Color(0xFFFFEAEA),
       'value': '500',
@@ -40,8 +42,7 @@ class ReportsProvider with ChangeNotifier {
   // Milestone Sections Data
   final List<Map<String, dynamic>> _milestoneSections = const [
     {
-      'title': 'Completed Milestones',
-      'items': [
+      'title': 'Completed Milestones', 'items': [
         {
           'title': 'Development Milestone 1',
           'description': 'Successfully achieved on February 15, 2025',

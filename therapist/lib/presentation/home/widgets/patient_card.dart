@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:therapist/presentation/therapy_goals/therapy_goals_screen.dart';
+import 'package:therapist/presentation/therapy_goals/therapy_home_screen.dart';
 
 class PatientCard extends StatelessWidget {
   final String name;
@@ -165,7 +167,9 @@ class PatientCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const TherapyHomeScreen()));
+            },
             child: const Text(
               'View or Manage Patient',
               style: TextStyle(

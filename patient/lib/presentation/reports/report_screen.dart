@@ -7,6 +7,8 @@ import 'package:patient/presentation/reports/widgets/milestone_list_item.dart';
 import 'package:patient/provider/reports_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../gen/assets.gen.dart';
+
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
 
@@ -35,9 +37,7 @@ class ReportsScreen extends StatelessWidget {
                           'Reports',
                           style: theme.textTheme.displayMedium,
                         ),
-                        const ImageIcon(AssetImage(
-                          'assets/calendar.png',
-                        )),
+                        Assets.icons.icCalendar.svg()
                       ],
                     ),
                     const SizedBox(height: 20),

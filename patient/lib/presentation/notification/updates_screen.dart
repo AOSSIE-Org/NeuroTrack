@@ -1,36 +1,36 @@
-
 import 'package:flutter/material.dart';
+import '../../gen/assets.gen.dart';
 import 'article_screen.dart';
 
 class UpdatesScreen extends StatelessWidget {
-  final List<Map<String, String>> latestVideos = [
+  final List<Map<String, dynamic>> latestVideos = [
     {
       'title': 'How to run reports',
       'views': '2.1k views · 5 days ago',
-      'thumbnail': 'assets/thumbnail_1.png',
+      'thumbnail': Assets.placeholders.thumbnail1,
     },
     {
       'title': 'How to run reports',
       'views': '2.1k views · 5 days ago',
-      'thumbnail': 'assets/thumbnail_1.png',
+      'thumbnail': Assets.placeholders.thumbnail1,
     }
   ];
 
-  final List<Map<String, String>> latestArticles = [
+  final List<Map<String, dynamic>> latestArticles = [
     {
       'title': 'New feature: Google Meet now has a custom background tool',
       'date': 'Jan 14, 2022',
-      'thumbnail': 'assets/thumbnail_1.png',
+      'thumbnail': Assets.placeholders.thumbnail1,
     },
     {
       'title': 'New feature: Google Meet now has a custom background tool',
       'date': 'Jan 14, 2022',
-      'thumbnail': 'assets/thumbnail_1.png',
+      'thumbnail': Assets.placeholders.thumbnail1,
     },
     {
       'title': 'New feature: Google Meet now has a custom background tool',
       'date': 'Jan 14, 2022',
-      'thumbnail': 'assets/thumbnail_1.png',
+      'thumbnail': Assets.placeholders.thumbnail1,
     },
   ];
 
@@ -46,12 +46,20 @@ class UpdatesScreen extends StatelessWidget {
             children: [
               const Text(
                 "Updates",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black , fontFamily: 'League Spartan'),
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontFamily: 'League Spartan'),
               ),
               const SizedBox(height: 24),
               const Text(
                 "Latest Videos",
-                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold ,color: Colors.black , fontFamily: 'League Spartan'),
+                style: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontFamily: 'League Spartan'),
               ),
               const SizedBox(height: 14),
               SizedBox(
@@ -93,7 +101,11 @@ class UpdatesScreen extends StatelessWidget {
               const SizedBox(height: 40),
               const Text(
                 "Latest Articles",
-                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold ,color:Colors.black, fontFamily: 'League Spartan'),
+                style: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontFamily: 'League Spartan'),
               ),
               const SizedBox(height: 20),
               Expanded(

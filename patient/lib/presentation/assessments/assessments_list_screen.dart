@@ -13,7 +13,6 @@ class AssessmentsListScreen extends StatefulWidget {
 }
 
 class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -47,40 +46,41 @@ class _AssessmentsListScreenState extends State<AssessmentsListScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              Consumer(
-                builder: (context, provider, child) {
-                  if (assessmentProvider.allAssessments.isEmpty) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  return Expanded(
-                    child: ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: assessmentProvider.allAssessments.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final assessment = assessmentProvider.allAssessments[index];
-                        return AssessmentCard(
-                          assessment: assessment,
-                          onTap: () {
-                            context.read<AssessmentProvider>().selectedAssessmentId = assessment.assessmentId;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AssessmentScreen(
-                                  assessment: assessment,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+              Consumer(builder: (context, provider, child) {
+                if (assessmentProvider.allAssessments.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
                 }
-              ),
+                return Expanded(
+                  child: ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: assessmentProvider.allAssessments.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final assessment =
+                          assessmentProvider.allAssessments[index];
+                      return AssessmentCard(
+                        assessment: assessment,
+                        onTap: () {
+                          context
+                              .read<AssessmentProvider>()
+                              .selectedAssessmentId = assessment.assessmentId;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AssessmentScreen(
+                                assessment: assessment,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                );
+              }),
             ],
           ),
         ),

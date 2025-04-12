@@ -1,5 +1,3 @@
-
-
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'patient_schedule_appointment_model.mapper.dart';
@@ -8,8 +6,8 @@ part 'patient_schedule_appointment_model.mapper.dart';
 // This class can have toEntity and fromEntity methods to convert to and from entity
 
 @MappableClass()
-class PatientScheduleAppointmentModel with PatientScheduleAppointmentModelMappable {
-
+class PatientScheduleAppointmentModel
+    with PatientScheduleAppointmentModelMappable {
   final String patientId;
   final String therapistId;
   final String serviceType;
@@ -25,5 +23,4 @@ class PatientScheduleAppointmentModel with PatientScheduleAppointmentModelMappab
     required this.slot,
     required this.appointmentName,
   });
-
 }

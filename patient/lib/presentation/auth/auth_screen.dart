@@ -1,8 +1,7 @@
-
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:patient/gen/assets.gen.dart';
 import 'package:patient/presentation/auth/personal_details_screen.dart';
 import 'package:patient/presentation/home/home_screen.dart';
 import 'package:patient/presentation/widgets/google_signin_button.dart';
@@ -11,7 +10,6 @@ import 'package:patient/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 import '../widgets/welcome_header.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -29,18 +27,18 @@ class _AuthScreenState extends State<AuthScreen> {
   StreamSubscription<AuthState>? _authSubscription;
 
   final List<OnboardingContent> _contents = [
-    const OnboardingContent(
-      image: 'assets/illustration.png',
+    OnboardingContent(
+      image: Assets.illustrations.i9nActivities,
       title: 'Daily Activities',
       description: 'Personalized Daily Activities, Tracked Effortlessly!',
     ),
-    const OnboardingContent(
-      image: 'assets/illustration1.png',
+    OnboardingContent(
+      image: Assets.illustrations.i9nGoals,
       title: 'Therapy Goals',
       description: 'Set and achieve your therapy goals with ease!',
     ),
-    const OnboardingContent(
-      image: 'assets/illustration2.png',
+    OnboardingContent(
+      image: Assets.illustrations.i9nMilestones,
       title: 'Health Tracking',
       description: 'Monitor your health metrics with ease and accuracy!',
     ),
@@ -104,11 +102,12 @@ class _AuthScreenState extends State<AuthScreen> {
       Widget? nextScreen;
 
       if (authProvider.authNavigationStatus.isHome) {
-        final userName = supabase.auth.currentSession?.user.userMetadata?['full_name'];
+        final userName =
+            supabase.auth.currentSession?.user.userMetadata?['full_name'];
         nextScreen = HomeScreen(userName: userName ?? 'User');
       } else if (authProvider.authNavigationStatus.isPersonalDetails) {
         nextScreen = const PersonalDetailsScreen();
-      } else if(authProvider.authNavigationStatus.isError) {
+      } else if (authProvider.authNavigationStatus.isError) {
         SnackbarService.showError('An error occurred. Please try again.');
         return;
       }
@@ -136,7 +135,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   onPageChanged: (int page) {
                     setState(() => _currentPage = page);
                   },
-                  itemBuilder: (context, index) => _buildCarouselItem(_contents[index]),
+                  itemBuilder: (context, index) =>
+                      _buildCarouselItem(_contents[index]),
                 ),
 
                 Positioned(
@@ -158,7 +158,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   left: 0,
                   right: 0,
                   child: GoogleSignInButton(
-                    onPressed: () => context.read<AuthProvider>().signInWithGoogle(),
+                    onPressed: () =>
+                        context.read<AuthProvider>().signInWithGoogle(),
                   ),
                 ),
               ],
@@ -173,7 +174,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset(content.image, height: 200),
+        content.image.svg(height: 200),
         const SizedBox(height: 35),
         Text(
           content.title,
@@ -197,7 +198,6 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
         const SizedBox(height: 60),
-
       ],
     );
   }
@@ -217,7 +217,7 @@ class _AuthScreenState extends State<AuthScreen> {
 }
 
 class OnboardingContent {
-  final String image;
+  final SvgGenImage image;
   final String title;
   final String description;
 

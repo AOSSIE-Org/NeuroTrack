@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   static const Color primaryColor =
       Color(0xFF6366F1); // The purple/blue color from your design
-  static const Color secondaryColor = Color(0xFF818CF8);
+  static const Color secondaryColor = Color(0xFF7A86F8);
   static const Color backgroundColor = Colors.white;
   static const Color textColor = Color(0xFF1F2937);
   static const Color subtitleColor = Color(0xFF6B7280);

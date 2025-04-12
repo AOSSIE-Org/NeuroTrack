@@ -1,99 +1,86 @@
 import 'package:flutter/material.dart';
 
-class SessionProvider with ChangeNotifier {
-  DateTime _selectedDate = DateTime.now();
+class SessionProvider extends ChangeNotifier {
   String _selectedFilter = 'All';
+  String get selectedFilter => _selectedFilter;
 
-  // Example session data (You can replace it with your API data)
-  final List<Map<String, dynamic>> _allSessions = [
+  // Mock data for sessions - replace with actual data fetching logic
+  List<Map<String, dynamic>> _sessions = [
     {
       'patientName': 'John Doe',
       'patientId': 'P001',
-      'phone': '123-456-7890',
-      'therapyName': 'Physical Therapy',
-      'therapyMode': 'Online',
+      'phone': '+1 234 567 8900',
+      'therapyName': 'Cognitive Behavioral Therapy',
+      'therapyMode': 'In-person',
       'time': '10:00 AM',
-      'duration': '45 mins',
-      'status': 'Completed',
+      'duration': '60 min',
+      'status': 'Pending',
     },
     {
       'patientName': 'Jane Smith',
       'patientId': 'P002',
-      'phone': '987-654-3210',
-      'therapyName': 'Speech Therapy',
-      'therapyMode': 'In-Person',
-      'time': '11:30 AM',
-      'duration': '30 mins',
-      'status': 'Pending',
-    },
-    {
-      'patientName': 'Emily Johnson',
-      'patientId': 'P003',
-      'phone': '555-123-4567',
+      'phone': '+1 234 567 8901',
       'therapyName': 'Occupational Therapy',
-      'therapyMode': 'Online',
+      'therapyMode': 'Virtual',
       'time': '2:00 PM',
-      'duration': '60 mins',
-      'status': 'Confirmed',
+      'duration': '45 min',
+      'status': 'Completed',
     },
     {
-      'patientName': 'Michael Brown',
-      'patientId': 'P004',
-      'phone': '555-765-4321',
-      'therapyName': 'Cognitive Therapy',
-      'therapyMode': 'In-Person',
-      'time': '3:30 PM',
-      'duration': '45 mins',
-      'status': 'Completed',
+      'patientName': 'Alice Johnson',
+      'patientId': 'P003',
+      'phone': '+1 234 567 8902',
+      'therapyName': 'Physical Therapy',
+      'therapyMode': 'In-person',
+      'time': '4:30 PM',
+      'duration': '60 min',
+      'status': 'Cancelled',
     },
   ];
 
-  // Filters for session categories
-  final List<String> _filters = ['All', 'Pending', 'Confirmed', 'Completed'];
+  List<Map<String, dynamic>> get sessions => _sessions;
 
-  // 🔹 Get selected date
-  DateTime get selectedDate => _selectedDate;
-
-  // 🔹 Set selected date and notify listeners
-  void setSelectedDate(DateTime date) {
-    _selectedDate = date;
-    notifyListeners();
+  List<Map<String, dynamic>> get filteredSessions {
+    if (_selectedFilter == 'All') {
+      return _sessions;
+    } else {
+      return _sessions.where((session) => session['status'] == _selectedFilter).toList();
+    }
   }
 
-  // 🔹 Get selected filter
-  String get selectedFilter => _selectedFilter;
-
-  // 🔹 Set selected filter and notify listeners
   void setSelectedFilter(String filter) {
     _selectedFilter = filter;
     notifyListeners();
   }
 
-  // 🔹 Get all sessions
-  List<Map<String, dynamic>> get allSessions => _allSessions;
+  // Methods to add, update, or delete sessions
+  void addSession(Map<String, dynamic> session) {
+    _sessions.add(session);
+    notifyListeners();
+  }
 
-  // 🔹 Get filters
-  List<String> get filters => _filters;
-
-  // 🔹 Get filtered sessions based on selected filter
-  List<Map<String, dynamic>> get filteredSessions {
-    if (_selectedFilter == 'All') {
-      return _allSessions;
-    } else {
-      return _allSessions
-          .where((session) => session['status'] == _selectedFilter)
-          .toList();
+  void updateSession(int index, Map<String, dynamic> updatedSession) {
+    if (index >= 0 && index < _sessions.length) {
+      _sessions[index] = updatedSession;
+      notifyListeners();
     }
   }
 
-  // 🔹 Get count of sessions for each filter
-  Map<String, int> get filterCounts {
-    Map<String, int> counts = {
-      'All': _allSessions.length,
-      'Pending': _allSessions.where((s) => s['status'] == 'Pending').length,
-      'Confirmed': _allSessions.where((s) => s['status'] == 'Confirmed').length,
-      'Completed': _allSessions.where((s) => s['status'] == 'Completed').length,
-    };
-    return counts;
+  void deleteSession(int index) {
+    if (index >= 0 && index < _sessions.length) {
+      _sessions.removeAt(index);
+      notifyListeners();
+    }
+  }
+
+
+  DateTime _selectedDate = DateTime.now();
+
+  DateTime get selectedDate => _selectedDate;
+
+  void setSelectedDate(DateTime date) {
+    _selectedDate = date;
+    notifyListeners();
   }
 }
+

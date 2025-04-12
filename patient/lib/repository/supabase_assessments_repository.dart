@@ -1,25 +1,25 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:patient/core/entities/assessment_entities/assessment_answer_entity.dart';
 import 'package:patient/core/entities/assessment_entities/assessment_entity.dart';
-import 'package:patient/core/entities/assessment_entities/assessment_result_entity.dart' show AssessmentResultEntity, AssessmentResultEntityMapper;
-import 'package:patient/core/repository/assessment_repository.dart';
+import 'package:patient/core/entities/assessment_entities/assessment_result_entity.dart'
+    show AssessmentResultEntityMapper;
+import 'package:patient/core/repository/assessment/assessment_repository.dart';
 import 'package:patient/core/result/result.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseAssessmentsRepository implements AssessmentsRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-
   @override
   Future<List<Map<String, dynamic>>> fetchAssessmentById(String id) async {
+    print('Fetching assessment with id: $id');
     final response = await _supabase
         .from('assessments')
         .select('*')
         .eq('id', id)
         .limit(1)
         .maybeSingle();
-
+print('Response: $response');
     return response != null ? [response] : [];
   }
 
@@ -27,8 +27,10 @@ class SupabaseAssessmentsRepository implements AssessmentsRepository {
   Future<ActionResult> fetchAllAssessments() async {
     try {
       final response = await _supabase.from('assessments').select('*');
-      final data = response.map((e) => AssessmentEntityMapper.fromMap(e)).toList();
-      return ActionResultSuccess(data: data.map((e) => e.toModel()).toList(), statusCode: 200); 
+      final data =
+          response.map((e) => AssessmentEntityMapper.fromMap(e)).toList();
+      return ActionResultSuccess(
+          data: data.map((e) => e.toModel()).toList(), statusCode: 200);
     } catch (e) {
       return ActionResultFailure(errorMessage: e.toString(), statusCode: 500);
     }
@@ -56,6 +58,5 @@ class SupabaseAssessmentsRepository implements AssessmentsRepository {
     } catch (e) {
       return ActionResultFailure(errorMessage: e.toString(), statusCode: 500);
     }
-
   }
 }

@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+
+import '../../gen/assets.gen.dart';
 
 class ArticleScreen extends StatelessWidget {
   final String articleTitle;
@@ -28,7 +29,8 @@ class ArticleScreen extends StatelessWidget {
           child: CircleAvatar(
             backgroundColor: const Color.fromARGB(255, 240, 237, 237),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+              icon: const Icon(Icons.arrow_back_ios_new,
+                  color: Colors.black, size: 20),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -62,7 +64,7 @@ class ArticleScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Card-like Playable Section
-            
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 30),
               decoration: BoxDecoration(
@@ -85,33 +87,34 @@ class ArticleScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        
                         Row(
                           children: [
                             // Play Icon
                             SizedBox(width: 2),
-                            const Icon(Icons.play_circle_outline, color: Color.fromRGBO(122, 134, 248, 1), size: 30),
+                            const Icon(Icons.play_circle_outline,
+                                color: Color.fromRGBO(122, 134, 248, 1),
+                                size: 30),
 
                             const SizedBox(width: 6),
 
                             // "Check Now" Text
                             const Text(
                               "Check Now",
-                              style: TextStyle(fontSize: 10, color: Color.fromRGBO(122, 134, 248, 1)),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: Color.fromRGBO(122, 134, 248, 1)),
                             ),
                           ],
                         ),
                       ],
                     ),
                   ),
-
                   // Right side: Illustration Image
-                  Image.asset(
-                    'assets/heartbeat_illustration.png', // Replace with correct asset path
-                    width: 90,  // Adjusted size to match design
+                  Assets.illustrations.i9nHeartbeat.svg(
+                    width: 90, // Adjusted size to match design
                     height: 90,
                     fit: BoxFit.contain,
-                  ),
+                  )
                 ],
               ),
             ),

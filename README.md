@@ -62,23 +62,81 @@ Run the app:
 flutter run
 ```
 
-## Supabase Setup
+## **Supabase and Google Cloud Console Setup Guide**  
 
-1. Sign up or log in to Supabase at [Supabase](https://supabase.com)
-2. Create a new project in the Supabase dashboard
-3. Once the project is created, go to **Project Settings**
-4. In the **API** section, you will find:
-   - **Project URL (SUPABASE_URL)**
-   - **Project API Keys (SUPABASE_KEY - use the anon public key)**
-5. Create a `.env` file in the root directory of both patient and therapist apps:
+Follow these steps to set up **Supabase** and **Google Cloud Console** for authentication.  
+
+---
+
+### **1. Supabase Setup**  
+
+#### **Step 1: Sign Up & Create a Project**  
+- Go to [Supabase](https://supabase.com), sign up/log in, and create a **New Project**.  
+- Set a **Project Name** and **Database Password** (store it securely).  
+
+#### **Step 2: Retrieve API Keys**  
+- In **Project Settings > API**, find:  
+  - **SUPABASE_URL** (Project URL)  
+  - **SUPABASE_ANON_KEY** (use the anon public key)  
+
+---
+
+### **2. Google Cloud Console Setup**  
+
+#### **Step 1: Sign Up & Create a Project**  
+- Visit [Google Cloud Console](https://console.cloud.google.com/), sign in, and create a **New Project**.  
+
+#### **Step 2: Enable Google OAuth**  
+1. Go to **APIs & Services > Credentials > + CREATE CREDENTIALS > OAuth Client ID**.  
+2. Configure **OAuth Consent Screen** (set App Name, Email, and add scopes: `email`, `profile`, `openid`).  
+3. Choose **Web Application**, and under:  
+   - **Authorized JavaScript Origins**, enter your **Supabase URL**.
+     
+     ```
+     https://your-project-id.supabase.co
+     ```  
+   - **Authorized Redirect URIs**, add:  
+
+     ```
+     https://your-project-id.supabase.co/auth/v1/callback
+     ```  
+4. Click **Create** to get the **Client ID** and **Client Secret**.  
+5. Go to **OAuth Consent Screen > Test Users** and **add your email**.  
+
+#### Note: Replace your-project-id with your project id from Supabase: Project Settings (Left panel) -> Project Id
+
+---
+
+### **3. Connect Supabase & Google OAuth**  
+
+- In **Supabase Dashboard > Authentication > Providers**, enable **Google**.  
+- Enter **Client ID** and **Client Secret** from Google Cloud Console.  
+- Click **Save**.  
+
+---
+
+### **4. Environment Variables Setup**  
+
+Create a `.env` file in your project root and add:  
 
 ```sh
+# Supabase Credentials
 SUPABASE_URL=your_project_url
-SUPABASE_KEY=your_anon_key
+SUPABASE_ANON_KEY=your_anon_key
+
+# Google OAuth Credentials
+GOOGLE_WEB_CLIENT_ID=your_web_client_id
+GOOGLE_SECRET_KEY=your_secret_key
 ```
 
-6. Replace `your_project_url` and `your_anon_key` with the values from step 4.
+Replace placeholders with actual values from **Supabase** and **Google Cloud Console**.  
 
+---
+
+## **5. Testing the Setup**  
+
+- Start your app and test Google authentication.  
+- Check **Supabase > Authentication > Users** to verify logins.
 
 
 ## Patient Application Flow

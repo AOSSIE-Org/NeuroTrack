@@ -51,7 +51,7 @@ Future<void> _handleGoogleSignIn(BuildContext context) async {
 
   try {
     await authProvider.signInWithGoogle(); // Perform sign-in
-    final fullName = authProvider.getFullName();
+   // final fullName = authProvider.getFullName();
     // print(fullName);
      // Fetch full name after sign-in
   } catch (error) {

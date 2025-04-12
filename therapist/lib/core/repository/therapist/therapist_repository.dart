@@ -1,4 +1,5 @@
 import 'package:therapist/core/result/action_result.dart';
+import 'package:therapist/core/models/profession_model.dart';
 
 abstract interface class TherapistRepository {
 
@@ -84,4 +85,9 @@ abstract interface class TherapistRepository {
 
   Future<ActionResult> getTotalTherapies();
 
+  // New methods for fetching profession data
+  Future<ActionResult> fetchProfessions();
+  Future<ActionResult> fetchRegulatoryBodies(int professionId);
+  Future<ActionResult> fetchSpecializations(int professionId);
+  Future<ActionResult> fetchTherapies(int professionId);
 }

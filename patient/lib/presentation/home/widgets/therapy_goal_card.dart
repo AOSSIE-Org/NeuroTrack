@@ -1,10 +1,10 @@
 // therapy_goal_card.dart
 import 'package:flutter/material.dart';
-
+import 'package:patient/gen/assets.gen.dart';
 class TherapyGoalCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String imagePath;
+  final SvgGenImage illustration;
   final Color backgroundColor;
   final bool imageOnLeft;
 
@@ -12,7 +12,7 @@ class TherapyGoalCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
-    required this.imagePath,
+    required this.illustration,
     required this.backgroundColor,
     this.imageOnLeft = false,
   });
@@ -76,8 +76,7 @@ class TherapyGoalCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    return Image.asset(
-      imagePath,
+    return illustration.svg(
       height: 100,
       width: 80,
       fit: BoxFit.contain,

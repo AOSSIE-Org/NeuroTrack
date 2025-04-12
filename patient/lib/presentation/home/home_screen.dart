@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:patient/core/theme/theme.dart';
+import 'package:patient/presentation/appointments/appointment_list_screen.dart';
 import 'package:patient/presentation/home/widgets/home_screen_slider.dart';
 import 'package:patient/presentation/home/widgets/therapy_goal_card.dart';
 import 'package:patient/presentation/operations/therapy_goals.dart';
 import 'package:patient/presentation/reports/report_screen.dart'; // Import the new widget
 import 'package:patient/presentation/notification/updates_screen.dart';
+
+import '../../gen/assets.gen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -28,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _screens = [
       _buildHomeContent(),
       const ReportsScreen(),
-      _buildCalendarContent(),
+      const AppointmentListScreen(),
       UpdatesScreen(),
       _buildProfileContent(),
     ];
@@ -62,11 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildNavItem('assets/home.png', 0),
-                  _buildNavItem('assets/report.png', 1),
-                  _buildNavItem('assets/calendar.png', 2),
-                  _buildNavItem('assets/notifications.png', 3),
-                  _buildNavItem('assets/profile.png', 4),
+                  _buildNavItem(Assets.icons.icHome, 0),
+                  _buildNavItem(Assets.icons.icReport, 1),
+                  _buildNavItem(Assets.icons.icCalendar, 2),
+                  _buildNavItem(Assets.icons.icNotifications, 3),
+                  _buildNavItem(Assets.icons.icProfile, 4),
                 ],
               ),
             ),
@@ -76,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNavItem(String assetPath, int index) {
+  Widget _buildNavItem(SvgGenImage genIcon, int index) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -84,16 +87,14 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-        ),
-        child: ImageIcon(
-          AssetImage(assetPath),
-          color:
-              _selectedIndex == index ? AppTheme.secondaryColor : Colors.grey,
-        ),
-      ),
+          padding: const EdgeInsets.all(10),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+          ),
+          child: genIcon.svg(
+            color:
+                _selectedIndex == index ? AppTheme.secondaryColor : Colors.grey,
+          )),
     );
   }
 
@@ -130,30 +131,30 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => const TherapyGoalsScreen()),
                     );
                   },
-                  child: const TherapyGoalCard(
+                  child: TherapyGoalCard(
                     title: 'Therapy',
                     subtitle: 'Goals',
-                    imagePath: 'assets/illustration1.png',
+                    illustration: Assets.illustrations.i9nGoals,
                     backgroundColor: Color(0xFFF9F3E3),
                   ),
                 ),
                 const SizedBox(height: 15),
                 // Daily Activities Card
 
-                const TherapyGoalCard(
+                TherapyGoalCard(
                   title: 'Daily',
                   subtitle: 'Activities',
-                  imagePath: 'assets/illustration.png',
+                  illustration: Assets.illustrations.i9nActivities,
                   backgroundColor: Color(0xFFFEF4F0),
                   imageOnLeft: true,
                 ),
 
                 const SizedBox(height: 15),
                 // Development Milestones Card
-                const TherapyGoalCard(
+                TherapyGoalCard(
                   title: 'Development',
                   subtitle: 'Milestones',
-                  imagePath: 'assets/illustration2.png',
+                  illustration: Assets.illustrations.i9nMilestones,
                   backgroundColor: Color(0xFFF5FAF4),
                 ),
               ],
@@ -165,13 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Other screen dummy content
-
-  Widget _buildCalendarContent() {
-    return const Center(
-        child: Text('Calendar Screen', style: TextStyle(fontSize: 24)));
-  }
-
-
 
   Widget _buildProfileContent() {
     return const Center(
