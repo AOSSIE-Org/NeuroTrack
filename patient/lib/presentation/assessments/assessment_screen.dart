@@ -5,8 +5,6 @@ import 'package:patient/model/assessment_models/assessment_models.dart';
 import 'package:patient/presentation/widgets/snackbar_service.dart';
 import 'package:patient/provider/assessment_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:patient/presentation/result/result.dart';
-
 
 class AssessmentScreen extends StatefulWidget {
   const AssessmentScreen({
@@ -26,25 +24,22 @@ class AssessmentScreenState extends State<AssessmentScreen> {
     super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final assessmentProvider = context.read<AssessmentProvider>();
-      if (assessmentProvider.submitAssessmentStatus.isSuccess) {
-        SnackbarService.showSuccess(
-            '${assessmentProvider.assessmentResultModel?.message}');
-      } else if (assessmentProvider.submitAssessmentStatus.isFailure) {
-        SnackbarService.showError(
-            'Something went wrong. Please try again later.');
-      }
-    });
+  void _handleSubmit() async {
+    final assessmentProvider = context.read<AssessmentProvider>();
+    await assessmentProvider.submitAssessment();
+
+    if (assessmentProvider.submitAssessmentStatus.isSuccess) {
+      SnackbarService.showSuccess(
+          '${assessmentProvider.assessmentResultModel?.message}');
+    } else if (assessmentProvider.submitAssessmentStatus.isFailure) {
+      final errorMessage = assessmentProvider.errorMessage ??
+          'Something went wrong. Please try again later.';
+      SnackbarService.showError(errorMessage);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AssessmentProvider>(context, listen: true)
-        .submitAssessmentStatus;
     return Scaffold(
       body: SafeArea(
         child: Consumer<AssessmentProvider>(
@@ -98,36 +93,33 @@ class AssessmentScreenState extends State<AssessmentScreen> {
                   ),
                   const SizedBox(height: 20),
                   Center(
-                      child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-
-                          context.read<AssessmentProvider>().submitAssessment();
-
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.secondaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _handleSubmit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.secondaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 2,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
-                          elevation: 2, // Small shadow effect
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: const Text(
-                          'Submit Assessment',
-                          style: TextStyle(
-                            fontSize: 17,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                          child: const Text(
+                            'Submit Assessment',
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  )),
+                  ),
                 ],
               ),
             );
@@ -152,7 +144,6 @@ class QuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -195,23 +186,22 @@ class QuestionCard extends StatelessWidget {
                   side: const BorderSide(
                     color: Color(0xFF666666),
                     width: 1.5,
-
                   ),
-                  Expanded(
-                    child: Text(
-                      optionText,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.subtitleColor,
-                      ),
+                ),
+                Expanded(
+                  child: Text(
+                    optionText,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppTheme.subtitleColor,
                     ),
                   ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 }

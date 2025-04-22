@@ -63,17 +63,17 @@ class $AssetsIllustrationsGen {
   SvgGenImage get i9nActivities =>
       const SvgGenImage('assets/illustrations/i9n_activities.svg');
 
-  /// File path: assets/illustrations/i9n_adhd.svg
-  SvgGenImage get i9nAdhd =>
-      const SvgGenImage('assets/illustrations/i9n_adhd.svg');
+  /// File path: assets/illustrations/i9n_adhd.png
+  AssetGenImage get i9nAdhd =>
+      const AssetGenImage('assets/illustrations/i9n_adhd.png');
 
-  /// File path: assets/illustrations/i9n_aq10.svg
-  SvgGenImage get i9nAq10 =>
-      const SvgGenImage('assets/illustrations/i9n_aq10.svg');
+  /// File path: assets/illustrations/i9n_aq10.png
+  AssetGenImage get i9nAq10 =>
+      const AssetGenImage('assets/illustrations/i9n_aq10.png');
 
-  /// File path: assets/illustrations/i9n_autism.svg
-  SvgGenImage get i9nAutism =>
-      const SvgGenImage('assets/illustrations/i9n_autism.svg');
+  /// File path: assets/illustrations/i9n_autism.png
+  AssetGenImage get i9nAutism =>
+      const AssetGenImage('assets/illustrations/i9n_autism.png');
 
   /// File path: assets/illustrations/i9n_goals.svg
   SvgGenImage get i9nGoals =>
@@ -88,7 +88,7 @@ class $AssetsIllustrationsGen {
       const SvgGenImage('assets/illustrations/i9n_milestones.svg');
 
   /// List of all assets
-  List<SvgGenImage> get values => [
+  List<dynamic> get values => [
     i9nActivities,
     i9nAdhd,
     i9nAq10,

@@ -19,7 +19,7 @@ class SupabaseAssessmentsRepository implements AssessmentsRepository {
         .eq('id', id)
         .limit(1)
         .maybeSingle();
-print('Response: $response');
+    print('Response: $response');
     return response != null ? [response] : [];
   }
 
@@ -39,8 +39,26 @@ print('Response: $response');
   @override
   Future<ActionResult> submitAssessment(AssessmentAnswerEntity answers) async {
     try {
+      // Validate that all questions have been answered
+      if (answers.questions.isEmpty) {
+        return ActionResultFailure(
+          errorMessage: 'Please answer all questions before submitting',
+          statusCode: 400,
+        );
+      }
+
+      // Check for unanswered questions
+      final unansweredQuestions =
+          answers.questions.where((q) => q.answerId.isEmpty).toList();
+      if (unansweredQuestions.isNotEmpty) {
+        return ActionResultFailure(
+          errorMessage: 'Please answer all questions before submitting',
+          statusCode: 400,
+        );
+      }
+
       final jwtToken = dotenv.env['SUPABASE_ANON_KEY']!;
-      final resposne = await _supabase.functions.invoke(
+      final response = await _supabase.functions.invoke(
         'evaluate-assessments',
         headers: {
           'Content-Type': 'application/json',
@@ -48,15 +66,39 @@ print('Response: $response');
         },
         body: answers.toMap(),
       );
-      if (resposne.data != null) {
-        final data = AssessmentResultEntityMapper.fromMap(resposne.data);
+
+      if (response.data != null) {
+        final data = AssessmentResultEntityMapper.fromMap(response.data);
         return ActionResultSuccess(data: data.toModel(), statusCode: 200);
       } else {
         return ActionResultFailure(
-            errorMessage: 'Some error Occurred', statusCode: 400);
+          errorMessage: 'Failed to evaluate assessment. Please try again.',
+          statusCode: 400,
+        );
       }
     } catch (e) {
-      return ActionResultFailure(errorMessage: e.toString(), statusCode: 500);
+      if (e.toString().contains('NetworkError')) {
+        return ActionResultFailure(
+          errorMessage: 'Network error. Please check your internet connection.',
+          statusCode: 500,
+        );
+      } else if (e.toString().contains('401')) {
+        return ActionResultFailure(
+          errorMessage: 'Authentication error. Please log in again.',
+          statusCode: 401,
+        );
+      } else if (e.toString().contains('404')) {
+        return ActionResultFailure(
+          errorMessage:
+              'Server error: Assessment evaluation service is not available. Please try again later.',
+          statusCode: 404,
+        );
+      } else {
+        return ActionResultFailure(
+          errorMessage: 'An unexpected error occurred: ${e.toString()}',
+          statusCode: 500,
+        );
+      }
     }
   }
 }
