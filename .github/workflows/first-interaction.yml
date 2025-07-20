@@ -8,6 +8,9 @@ on:
 
 jobs:
   welcome:
+    permissions:
+      issues: write          # allow posting on issues
+      pull-requests: write   # allow posting on PRs
     runs-on: ubuntu-latest
     steps:
       - name: 'Welcome new users'
