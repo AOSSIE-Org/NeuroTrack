@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:patient/core/theme/theme.dart';
 import 'package:patient/presentation/activities/daily_activities_screen.dart';
 import 'package:patient/presentation/appointments/appointment_list_screen.dart';
+import 'package:patient/presentation/chatbot/chatbot_screen.dart';
 import 'package:patient/presentation/home/widgets/home_screen_slider.dart';
 import 'package:patient/presentation/home/widgets/therapy_goal_card.dart';
 import 'package:patient/presentation/operations/therapy_goals.dart';
@@ -117,7 +118,21 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Color.fromARGB(255, 2, 2, 2),
             ),
           ),
-          const SizedBox(height: 25),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChatbotScreen()),
+              );
+            },
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Assets.icons.icChatbot.svg(),
+              ),
+            ),
+          ),
           Expanded(
             child: ListView(
               children: [

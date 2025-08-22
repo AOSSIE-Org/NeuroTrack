@@ -19,6 +19,9 @@ class $AssetsIconsGen {
   SvgGenImage get icCalendar =>
       const SvgGenImage('assets/icons/ic_calendar.svg');
 
+  /// File path: assets/icons/ic_chatbot.svg
+  SvgGenImage get icChatbot => const SvgGenImage('assets/icons/ic_chatbot.svg');
+
   /// File path: assets/icons/ic_completed.svg
   SvgGenImage get icCompleted =>
       const SvgGenImage('assets/icons/ic_completed.svg');
@@ -46,6 +49,7 @@ class $AssetsIconsGen {
   /// List of all assets
   List<SvgGenImage> get values => [
     icCalendar,
+    icChatbot,
     icCompleted,
     icHome,
     icMissed,
