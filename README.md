@@ -22,6 +22,76 @@ Neurotrack aims to:
 
 This README provides instructions for setting up and running the Neurotrack patient and therapist apps, as well as configuring Supabase.
 
+
+## 🧠 Backend Setup
+
+### Prerequisites
+- A Supabase account and project at [supabase.com](https://supabase.com)
+- Node.js v18+ installed
+- Supabase CLI installed (see below)
+
+### 1. Install Supabase CLI
+
+**Windows:**
+```powershell
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+```
+Or use: `winget install Supabase.cli`
+
+**Linux/macOS:**
+```bash
+brew install supabase/tap/supabase
+```
+
+Verify: `supabase --version`
+
+### 2. Configure Environment
+
+Create `.env` in `supabase/scripts/`:
+```env
+SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+SUPABASE_KEY=YOUR_SERVICE_ROLE_KEY
+```
+> Find these in: Supabase Dashboard → Project Settings → API
+
+### 3. Setup Database
+
+**Option A - SQL Editor (Recommended):**
+1. Open Supabase Dashboard → SQL Editor
+2. Copy contents of `supabase/schemas/schema.sql`
+3. Paste and click **Run**
+
+**Option B - CLI:**
+```bash
+supabase db push
+```
+
+### 4. Seed Data
+
+```bash
+cd supabase/scripts
+npm install
+node seed_assessments.js
+```
+
+This adds autism assessment questionnaires (AQ-10 and CAT-Q).
+
+### 5. Deploy Edge Function
+
+```bash
+cd supabase/functions
+supabase functions deploy evaluate-assessments
+```
+
+This deploys the assessment evaluation function that calculates scores and stores results.
+
+---
+
+**Troubleshooting:**
+- "Invalid API key" → Use `service_role` key, not `anon` key
+- "supabaseKey is required" → Check `.env` file location and format
+
 ## Patient App Setup
 
 Navigate to the patient app directory:
