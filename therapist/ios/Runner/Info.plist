@@ -45,6 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to microphone for voice chat with NeuroBot.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app needs access to speech recognition for voice chat with NeuroBot.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 	<dict>
@@ -52,7 +56,7 @@
 		<string>Editor</string>
 		<key>CFBundleURLSchemes</key>
 		<array>
-		<string>com.googleusercontent.apps.861823949799-vc35cprkp249096uujjn0vvnmcvjppkn</string>
+		<string>com.googleusercontent.apps.638199147766-26mtku4lfo6tpjjq5i9bhhg5smfkf4dq</string>
 		</array>
 	</dict>
 	</array>

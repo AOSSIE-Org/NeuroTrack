@@ -56,6 +56,11 @@ dependencies:
   dotted_border: ^2.1.0
   uuid: ^4.5.1
   flutter_gemini: ^3.0.0
+  get_it: ^8.2.0
+  
+  # Voice features
+  speech_to_text: ^6.6.0
+  flutter_tts: ^3.8.5
 
 dev_dependencies:
   flutter_test:
