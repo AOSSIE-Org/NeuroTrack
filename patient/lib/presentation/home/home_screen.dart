@@ -8,6 +8,7 @@ import 'package:patient/presentation/home/widgets/therapy_goal_card.dart';
 import 'package:patient/presentation/operations/therapy_goals.dart';
 import 'package:patient/presentation/reports/report_screen.dart'; // Import the new widget
 import 'package:patient/presentation/notification/updates_screen.dart';
+import 'package:patient/presentation/games/games_screen.dart';
 
 import '../../gen/assets.gen.dart';
 
@@ -181,6 +182,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   subtitle: 'Milestones',
                   illustration: Assets.illustrations.i9nMilestones,
                   backgroundColor: Color(0xFFF5FAF4),
+                ),
+                const SizedBox(height: 15),
+                // Games Card
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const GamesScreen()),
+                    );
+                  },
+                  child: TherapyGoalCard(
+                    title: 'Games',
+                    subtitle: '',
+                    illustration: Assets.illustrations.i9nActivities,
+                    backgroundColor: const Color(0xFFE8F5E9),
+                  ),
                 ),
               ],
             ),

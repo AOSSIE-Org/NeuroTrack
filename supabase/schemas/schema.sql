@@ -33,6 +33,7 @@ CREATE TABLE therapist (
     regulatory_body TEXT,
     start_availability_time TEXT,
     end_availability_time TEXT,
+    license_number TEXT,
 );
 
 -- Create the package table
@@ -157,6 +158,7 @@ CREATE TABLE daily_activity_logs (
     activity_id UUID REFERENCES daily_activities(id) ON DELETE CASCADE,
     date TIMESTAMPTZ NOT NULL,
     activity_items JSONB NOT NULL
+    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE,
 );
 
 -- Indexes on foreign keys for better performance
