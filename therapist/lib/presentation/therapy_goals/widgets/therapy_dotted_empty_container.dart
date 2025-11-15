@@ -36,8 +36,11 @@ class TherapyDottedEmptyContainer extends StatelessWidget {
     return GestureDetector(
       onTap: () => _addFromExistingTherapyDetails(context),
       child: DottedBorder(
-        color: const Color(0xffC5C3C3),
-        radius: const Radius.circular(16),
+        options: RoundedRectDottedBorderOptions(
+          // color and radius now go inside options
+          radius: const Radius.circular(16),
+          color: const Color(0xffC5C3C3),
+        ),
         child: Container(
           alignment: Alignment.center,
           width: double.infinity,

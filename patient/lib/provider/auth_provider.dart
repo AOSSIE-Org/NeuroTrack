@@ -83,7 +83,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _handleWebSignIn() async {
     final supabaseUrl = dotenv.env['SUPABASE_URL'] ??
-        (throw Exception("Supabase URL not found in .env"));
+      (throw Exception("Supabase URL not found in .env"));
 
     await supabase.auth.signInWithOAuth(
       OAuthProvider.google,
@@ -93,29 +93,44 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> _handleMobileSignIn() async {
-    final webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID'] ??
-        (throw Exception("WEB_CLIENT_ID not found in .env"));
+    final webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID'] ?? 
+      (throw Exception("WEB_CLIENT_ID not found in .env"));
     final iosClientId = dotenv.env['GOOGLE_IOS_CLIENT_ID'];
-    
-    final GoogleSignIn googleSignIn = GoogleSignIn(
+
+    // Get the singleton instance.
+    final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+
+    // Initialize the GoogleSignIn instance.
+    await googleSignIn.initialize(
       clientId: Platform.isIOS ? iosClientId : null,
       serverClientId: webClientId,
-      scopes: ['email', 'profile'],
     );
 
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    // Define scopes (they were moved from the constructor/initialize to the sign-in call).
+    const List<String> scopes = ['email', 'profile'];
+
+    // Sign-in logic
+     final GoogleSignInAccount? googleUser = await googleSignIn.authenticate(
+      scopeHint: scopes, 
+    );
     if (googleUser == null) throw 'Sign in cancelled';
 
-    final GoogleSignInAuthentication googleAuth = 
-        await googleUser.authentication;
+    // Authorization to get access token
+    final authorization = await googleUser.authorizationClient.authorizeScopes(
+      scopes
+    );
+    final String accessToken = authorization.accessToken;
 
-    if (googleAuth.idToken == null) throw 'No ID Token found';
-    if (googleAuth.accessToken == null) throw 'No Access Token found';
-
+    // Authentication (It now synchronous as per v7.0+).
+    final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+    final String? idToken = googleAuth.idToken;
+    if (idToken == null) throw 'No ID Token found';
+    
+    // Supabase login (now with the retrieved accessToken)
     await supabase.auth.signInWithIdToken(
       provider: OAuthProvider.google,
-      idToken: googleAuth.idToken!,
-      accessToken: googleAuth.accessToken,
+      idToken: idToken,
+      accessToken: accessToken,
     );
   }
 
