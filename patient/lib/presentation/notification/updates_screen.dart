@@ -6,6 +6,15 @@ class UpdatesScreen extends StatelessWidget {
   Future<void> _launchURL(BuildContext context, String url) async {
     if (url.isEmpty) {
       print('URL is empty!');
+       if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Link unavailable.'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
       return;
     }
 
