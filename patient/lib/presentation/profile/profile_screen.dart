@@ -10,8 +10,8 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
-    final userName = user?.userMetadata?['full_name'] ?? 'Mohammed Mohsin';
-    final userEmail = user?.email ?? 'mohsin@gmail.com';
+    final userName = user?.userMetadata?['full_name'] ?? 'User';
+    final userEmail = user?.email ?? 'demo@gmail.com';
 
     return Scaffold(
       backgroundColor: Colors.white,
