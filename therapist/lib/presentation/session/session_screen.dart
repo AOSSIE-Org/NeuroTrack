@@ -169,7 +169,7 @@ class _SessionScreenState extends State<SessionScreen> {
                             time: session.timestamp.toString(),
                             duration: '30',
                             status: session.status ?? '',
-                            cancelMessage: '',
+                            cancelMessage: null,
                           ),
                         ),
                       );
