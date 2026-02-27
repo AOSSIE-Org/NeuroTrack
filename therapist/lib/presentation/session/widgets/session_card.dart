@@ -38,7 +38,7 @@ class SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isCancelled = status == 'Cancelled';
+    final bool isCancelled = status.toLowerCase() == 'cancelled';
 
     return Container(
       decoration: BoxDecoration(
@@ -191,7 +191,7 @@ class SessionCard extends StatelessWidget {
           ),
 
           // Cancel message or action button
-          if (cancelMessage != null)
+          if (cancelMessage != null && cancelMessage!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
@@ -203,7 +203,7 @@ class SessionCard extends StatelessWidget {
                 ),
               ),
             )
-          else if (status == 'Pending')
+          else if (status.toLowerCase() == 'pending')
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: TextButton(
