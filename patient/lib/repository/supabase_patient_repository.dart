@@ -147,6 +147,8 @@ class SupabasePatientRepository implements PatientRepository {
       .eq('patient_id', _supabaseClient.auth.currentUser!.id)
       .gte('date', startDate.toIso8601String())
       .lte('date', endDate.toIso8601String())
+      .order('date', ascending: false)
+      .limit(1)
       .maybeSingle();
       
       if (response == null || response.isEmpty) {
