@@ -19,6 +19,13 @@ class TimeSlotBottomSheet extends StatelessWidget {
     return Consumer<AppointmentsProvider>(
       builder: (context, appointmentsProvider, child) {
         // Ensure available slots are loaded
+        if (appointmentsProvider.isFetchingSlots) {
+          return const SizedBox(
+            height: 160,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         if (appointmentsProvider.availableTimeSlots.isEmpty) {
           return Center(
               child: Text(
