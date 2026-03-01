@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:patient/core/constants/updates_constants.dart';
@@ -6,7 +8,7 @@ class UpdatesScreen extends StatelessWidget {
   // Helper method to launch URLs with multiple fallback options
   Future<void> _launchURL(BuildContext context, String url) async {
     if (url.isEmpty) {
-      print('URL is empty!');
+      log('URL is empty!');
        if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -19,11 +21,11 @@ class UpdatesScreen extends StatelessWidget {
       return;
     }
 
-    print('Attempting to launch: $url');
+    log('Attempting to launch: $url');
     
     try {
       final uri = Uri.parse(url);
-      print('Parsed URI: $uri');
+      log('Parsed URI: $uri');
       
       // Show loading indicator
       if (context.mounted) {
@@ -42,26 +44,26 @@ class UpdatesScreen extends StatelessWidget {
         mode: LaunchMode.externalApplication,
       );
       
-      print('Launch attempt 1 (externalApplication): $launched');
+      log('Launch attempt 1 (externalApplication): $launched');
       
       // Try method 2: platformDefault if first fails
       if (!launched) {
-        print('Trying platformDefault mode...');
+        log('Trying platformDefault mode...');
         launched = await launchUrl(
           uri,
           mode: LaunchMode.platformDefault,
         );
-        print('Launch attempt 2 (platformDefault): $launched');
+        log('Launch attempt 2 (platformDefault): $launched');
       }
       
       // Try method 3: inAppWebView as last resort
       if (!launched) {
-        print('Trying inAppWebView mode...');
+        log('Trying inAppWebView mode...');
         launched = await launchUrl(
           uri,
           mode: LaunchMode.inAppWebView,
         );
-        print('Launch attempt 3 (inAppWebView): $launched');
+        log('Launch attempt 3 (inAppWebView): $launched');
       }
       
       if (!launched && context.mounted) {
@@ -74,13 +76,13 @@ class UpdatesScreen extends StatelessWidget {
         );
       }
     } catch (e) {
-      print('Error launching URL: $e');
+      log('Error launching URL: $e');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error opening link: ${e.toString()}'),
-            duration: const Duration(seconds: 3),
-            backgroundColor: Colors.red[700],
+          const SnackBar(
+            content: Text('Unable to open this link. Please try again later.'),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -217,7 +219,7 @@ class UpdatesScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         final url = video['url']?.toString() ?? '';
-        print('Video card tapped: ${video['title']}');
+        log('Video card tapped: ${video['title']}');
         _launchURL(context, url);
       },
       child: Container(
@@ -361,7 +363,7 @@ class UpdatesScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         final url = article['url']?.toString() ?? '';
-        print('Article card tapped: ${article['title']}');
+        log('Article card tapped: ${article['title']}');
         _launchURL(context, url);
       },
       child: Container(
