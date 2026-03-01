@@ -57,9 +57,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   google_fonts: ^6.1.0
   flutter_native_splash: ^2.3.6
-  google_sign_in: ^6.1.6
-  carousel_slider: ^4.0.0
-  flutter_dotenv: ^5.2.1
+  google_sign_in: ^7.2.0
+  carousel_slider: ^5.1.1
+  flutter_dotenv: ^6.0.0
 
 
 # For information on the generic Dart part of this file, see the
@@ -71,10 +71,10 @@ dependencies:
   intl: ^0.20.2
   flutter_svg: ^2.0.17
   vector_graphics: ^1.1.18
-  dotted_border: ^2.1.0
+  dotted_border: ^3.1.0
   uuid: ^4.5.1
   flutter_gemini: ^3.0.0
-  get_it: ^8.2.0
+  get_it: ^9.0.5
   rxdart: ^0.28.0
 
 dev_dependencies:
@@ -82,7 +82,7 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^2.4.15
   dart_mappable_builder: ^4.4.0
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
   flutter_gen_runner:
 
 # The following line ensures that the Material Icons font is
