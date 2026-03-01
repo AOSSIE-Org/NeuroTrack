@@ -99,11 +99,12 @@ class SupabaseAuthRepository implements AuthRepository {
           .from('session')
           .select('timestamp')
           .eq('therapist_id', therapistId)
-          .gte('timestamp', startOfDay.toIso8601String())
-          .lte('timestamp', endOfDay.toIso8601String());
+          .eq('status', 'accepted')
+          .gte('timestamp', startOfDay.toUtc().toIso8601String())
+          .lte('timestamp', endOfDay.toUtc().toIso8601String());
 
       final bookedTimestamps =
-          (response as List).map((e) => DateTime.parse(e['timestamp'])).toSet();
+          (response as List).map((e) => DateTime.parse(e['timestamp']).toLocal()).toSet();
 
       final startHourOfTherapist =
           int.parse(startTimeOfTherapist.split(':')[0]);
