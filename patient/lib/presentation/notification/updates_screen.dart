@@ -24,7 +24,23 @@ class UpdatesScreen extends StatelessWidget {
     log('Attempting to launch: $url');
     
     try {
-      final uri = Uri.parse(url);
+      final uri = Uri.tryParse(url.trim());
+      final isValidWebUrl = uri != null &&
+          uri.isAbsolute &&
+          (uri.scheme == 'http' || uri.scheme == 'https') &&
+          uri.host.isNotEmpty;
+      if (!isValidWebUrl) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Invalid link.'),
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
       log('Parsed URI: $uri');
       
       // Show loading indicator
