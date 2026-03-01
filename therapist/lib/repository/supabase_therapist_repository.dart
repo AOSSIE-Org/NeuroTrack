@@ -67,7 +67,7 @@ class SupabaseTherapistRepository implements TherapistRepository {
   @override
   Future<ActionResult> getTherapistPatients() async {
    try {
-      final response = await _supabaseClient.from('patients')
+      final response = await _supabaseClient.from('patient')
       .select('*')
       .eq('therapist_id', _supabaseClient.auth.currentUser!.id);
     
