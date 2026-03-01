@@ -123,7 +123,10 @@ class SupabasePatientRepository implements PatientRepository {
   @override
   Future<ActionResult> deleteAppointment(String id) async {
     try {
-      await _supabaseClient.from('session').delete().eq('id', id);
+      final response = await _supabaseClient.from('session').delete().eq('id', id).eq('patient_id', _supabaseClient.auth.currentUser!.id).select();
+      if (response.isEmpty) {
+        return ActionResultFailure(errorMessage: 'Appointment not found or not authorized', statusCode: 404);
+      }
       return ActionResultSuccess(
         data: 'Appointment deleted successfully',
         statusCode: 200
