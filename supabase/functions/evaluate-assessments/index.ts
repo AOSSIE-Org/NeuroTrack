@@ -26,8 +26,18 @@ Deno.serve( async (req) => {
     if (typeof body.assessment_id !== "string" || body.assessment_id.trim() === "") {
       invalidFields.push("assessment_id");
     }
-    if (!Array.isArray(body.questions) || body.questions.length === 0) {
-      invalidFields.push("questions (non-empty array)");
+    const hasValidQuestions =
+      Array.isArray(body.questions) &&
+      body.questions.length > 0 &&
+      body.questions.every(
+        (q: unknown) =>
+          !!q &&
+          typeof q === "object" &&
+          typeof (q as Record<string, unknown>).question_id === "string" &&
+          typeof (q as Record<string, unknown>).answer_id === "string",
+      );
+    if (!hasValidQuestions) {
+      invalidFields.push("questions (non-empty array of objects with question_id and answer_id strings)");
     }
     if (invalidFields.length > 0) {
       return new Response(
