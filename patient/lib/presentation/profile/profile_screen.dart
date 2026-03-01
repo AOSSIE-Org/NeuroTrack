@@ -12,6 +12,7 @@ class ProfileScreen extends StatelessWidget {
     final user = Supabase.instance.client.auth.currentUser;
     final userName = user?.userMetadata?['full_name'] ?? 'User';
     final userEmail = user?.email ?? 'demo@gmail.com';
+    final userPhone = user?.phone ?? user?.userMetadata?['phone'] ?? '+91 1234567890';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -66,14 +67,16 @@ class ProfileScreen extends StatelessWidget {
                               color: Color(0xFF6B7280),
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            '+91 1234567890',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF6B7280),
+                          if (userPhone.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              userPhone,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF6B7280),
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),
