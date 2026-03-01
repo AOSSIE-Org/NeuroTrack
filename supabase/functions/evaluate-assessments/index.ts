@@ -7,34 +7,35 @@ import {
   AssessmentEvaluationQuestionDTO,
 } from "./dto/types.ts";
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
-/**
- * Supabase Edge Function to evaluate an autism assessment.
- * 
- * This function:
- * 1. Receives a request containing `assessment_id` and `questions` (answered by the user).
- * 2. Fetches the assessment data from the `assessments` table in Supabase.
- * 3. Calculates the total score based on the user's answers.
- * 4. Compares the total score with the assessment's cutoff score.
- * 5. Returns a JSON response indicating whether the user is likely autistic.
- * 
- * @param {Request} req - The HTTP request object containing JSON payload.
- * @returns {Response} - A JSON response with the assessment results.
- */
+
 Deno.serve( async (req) => {
   try {
     const body = await req.json().catch(() => null);
-    if (
-      !body ||
-      !body.patient_id ||
-      !body.assessment_id ||
-      !Array.isArray(body.questions) ||
-      body.questions.length === 0
-    ) {
+
+    if (!body || typeof body !== "object") {
       return new Response(
-        JSON.stringify({ error: "Missing or invalid request body. Required fields: patient_id, assessment_id, questions (non-empty array)." }),
+        JSON.stringify({ error: "Missing or invalid request body. Expected JSON object with fields: patient_id, assessment_id, questions (non-empty array)." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
+
+    const invalidFields: string[] = [];
+    if (typeof body.patient_id !== "string" || body.patient_id.trim() === "") {
+      invalidFields.push("patient_id");
+    }
+    if (typeof body.assessment_id !== "string" || body.assessment_id.trim() === "") {
+      invalidFields.push("assessment_id");
+    }
+    if (!Array.isArray(body.questions) || body.questions.length === 0) {
+      invalidFields.push("questions (non-empty array)");
+    }
+    if (invalidFields.length > 0) {
+      return new Response(
+        JSON.stringify({ error: `Missing or invalid fields: ${invalidFields.join(", ")}.` }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const { patient_id, assessment_id, questions } = body;
     const { data, error } = await supabase
       .from("assessments")
@@ -84,14 +85,23 @@ Deno.serve( async (req) => {
         totalScore += answer.score;
         scoredCount++;
       }
+      const submittedCount = answered_questions.questions.length;
       if (scoredCount === 0) {
         return new Response(
           JSON.stringify({ error: "No questions could be scored. Check that question_id and answer_id values match the assessment." }),
           { status: 422, headers: { "Content-Type": "application/json" } }
         );
+      } else if (scoredCount < submittedCount) {
+        return new Response(
+          JSON.stringify({
+            error: "Only a subset of submitted questions could be scored. Check that question_id and answer_id values match the assessment.",
+            scored_questions: scoredCount,
+            submitted_questions: submittedCount,
+          }),
+          { status: 422, headers: { "Content-Type": "application/json" } }
+        );
       }
       const isAutistic = totalScore >= assessment.cutoff_score;
-      
       const responseData = {
         assessment_score: totalScore,
         is_autistic: isAutistic,
