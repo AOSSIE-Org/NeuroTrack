@@ -8,6 +8,8 @@ import {
   AssessmentEvaluationQuestionDTO,
 } from "./dto/types.ts";
 
+const JSON_HEADERS = { "Content-Type": "application/json" };
+
 /**
  * Supabase Edge Function to evaluate an autism assessment.
  *
@@ -30,7 +32,7 @@ Deno.serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: "Missing Authorization header" }),
-        { status: 401 }
+        { status: 401, headers: JSON_HEADERS }
       );
     }
 
@@ -52,11 +54,38 @@ Deno.serve(async (req) => {
     if (userError || !user) {
       return new Response(
         JSON.stringify({ error: "Unauthorized: Invalid or expired token" }),
-        { status: 401 }
+        { status: 401, headers: JSON_HEADERS }
       );
     }
 
-    const { assessment_id, questions } = await req.json();
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON payload" }),
+        { status: 400, headers: JSON_HEADERS }
+      );
+    }
+
+    if (
+      !body ||
+      typeof body !== "object" ||
+      typeof (body as { assessment_id?: unknown }).assessment_id !== "string" ||
+      !Array.isArray((body as { questions?: unknown }).questions)
+    ) {
+      return new Response(
+        JSON.stringify({
+          error: "Invalid payload: assessment_id and questions are required",
+        }),
+        { status: 400, headers: JSON_HEADERS }
+      );
+    }
+
+    const { assessment_id, questions } = body as {
+      assessment_id: string;
+      questions: AssessmentEvaluationQuestionDTO[];
+    };
 
     const patient_id = user.id;
 
@@ -66,17 +95,17 @@ Deno.serve(async (req) => {
       .eq("id", assessment_id)
       .single();
 
-    if (error) {
-      return new Response(
-        JSON.stringify({ error: "Internal Server Error" }),
-        { status: 500 }
-      );
-    }
-
     if (!data) {
       return new Response(
         JSON.stringify({ error: "Assessment not found" }),
-        { status: 404 }
+        { status: 404, headers: JSON_HEADERS }
+      );
+    }
+
+    if (error) {
+      return new Response(
+        JSON.stringify({ error: "Internal Server Error" }),
+        { status: 500, headers: JSON_HEADERS }
       );
     }
 
@@ -106,14 +135,27 @@ Deno.serve(async (req) => {
 
     let totalScore = 0;
 
+    const seenQuestionIds = new Set<string>();
     for (let i = 0; i < answered_questions.questions.length; i++) {
       const question = answered_questions.questions[i];
+
+      if (seenQuestionIds.has(question.question_id)) {
+        return new Response(
+          JSON.stringify({ error: "Duplicate question_id in submission" }),
+          { status: 400, headers: JSON_HEADERS }
+        );
+      }
+      seenQuestionIds.add(question.question_id);
+
       const matched_question = assessment.questions.find(
         (q) => q.question_id === question.question_id
       );
 
       if (!matched_question) {
-        continue;
+        return new Response(
+          JSON.stringify({ error: "Invalid question_id in submission" }),
+          { status: 400, headers: JSON_HEADERS }
+        );
       }
 
       const answer = matched_question.options.find(
@@ -121,7 +163,10 @@ Deno.serve(async (req) => {
       );
 
       if (!answer) {
-        continue;
+        return new Response(
+          JSON.stringify({ error: "Invalid answer_id for question" }),
+          { status: 400, headers: JSON_HEADERS }
+        );
       }
 
       totalScore += answer.score;
@@ -147,20 +192,43 @@ Deno.serve(async (req) => {
       });
 
     if (insertError) {
+      const code = (insertError as { code?: string }).code;
+      const message = (insertError as { message?: string }).message || "";
+      const lowerMessage = message.toLowerCase();
+
+      let status = 500;
+
+      if (
+        code === "42501" ||
+        lowerMessage.includes("permission denied") ||
+        lowerMessage.includes("rls") ||
+        lowerMessage.includes("not authorized")
+      ) {
+        status = 403;
+      } else if (code && (code.startsWith("22") || code.startsWith("23"))) {
+        status = 400;
+      }
+
       return new Response(
         JSON.stringify({ error: "Failed to save assessment result" }),
-        { status: 500 }
+        { status, headers: JSON_HEADERS }
       );
     }
 
     return new Response(JSON.stringify(responseData), {
-      headers: { "Content-Type": "application/json" },
+      headers: JSON_HEADERS,
       status: 200,
     });
-  } catch (error) {
+  } catch (err) {
+    const errorPayload = {
+      message: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? (err.stack?.split("\n")[0] ?? "") : "",
+    };
+    console.error("[evaluate-assessments] Unhandled error:", errorPayload);
+
     return new Response(
       JSON.stringify({ error: "Internal Server Error" }),
-      { status: 500 }
+      { status: 500, headers: JSON_HEADERS }
     );
   }
 });
