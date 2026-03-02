@@ -84,8 +84,27 @@ Deno.serve(async (req) => {
 
     const { assessment_id, questions } = body as {
       assessment_id: string;
-      questions: AssessmentEvaluationQuestionDTO[];
+      questions: unknown[];
     };
+
+    for (let i = 0; i < questions.length; i++) {
+      const item = questions[i];
+      if (
+        !item ||
+        typeof item !== "object" ||
+        typeof (item as { question_id?: unknown }).question_id !== "string" ||
+        typeof (item as { answer_id?: unknown }).answer_id !== "string"
+      ) {
+        return new Response(
+          JSON.stringify({
+            error: `Invalid question at index ${i}: question_id and answer_id are required`,
+          }),
+          { status: 400, headers: JSON_HEADERS }
+        );
+      }
+    }
+
+    const validatedQuestions = questions as AssessmentEvaluationQuestionDTO[];
 
     const patient_id = user.id;
 
@@ -111,7 +130,7 @@ Deno.serve(async (req) => {
 
     const answered_questions: AssessmentEvaluationRequestDTO = {
       assessment_id: assessment_id,
-      questions: questions.map((q: AssessmentEvaluationQuestionDTO) => ({
+      questions: validatedQuestions.map((q: AssessmentEvaluationQuestionDTO) => ({
         question_id: q.question_id,
         answer_id: q.answer_id,
       })),
