@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:patient/core/services/voice_service.dart';
 import 'package:patient/presentation/chatbot/widgets/message_bubble.dart';
 
 import 'util/chat_manager.dart';
@@ -12,6 +14,42 @@ class ChatbotScreen extends StatefulWidget {
 
 class _ChatbotScreenState extends State<ChatbotScreen> {
   final TextEditingController _textController = TextEditingController();
+  final VoiceService _voiceService = VoiceService.instance;
+
+  bool _isListening = false;
+  String _lastSpokenText = '';
+
+  StreamSubscription<String>? _speechSubscription;
+  StreamSubscription<bool>? _listeningSubscription;
+  StreamSubscription<List<ChatMessageModel>>? _messageSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _voiceService.initialize();
+
+    _speechSubscription = _voiceService.speechStream.listen((text) {
+      if (text.isNotEmpty) {
+        _textController.text = text;
+        _handleSend();
+      }
+    });
+
+    _listeningSubscription = _voiceService.listeningStream.listen((isListening) {
+      setState(() => _isListening = isListening);
+    });
+
+    _messageSubscription = ChatManager.instance.messageStream.skip(1).listen((messages) {
+      if (messages.isEmpty) return;
+      final last = messages.last;
+      if (last.type != ChatMessageType.user &&
+          last.type != ChatMessageType.typing &&
+          last.text != _lastSpokenText) {
+        _lastSpokenText = last.text;
+        _voiceService.speak(last.text);
+      }
+    });
+  }
 
   void _handleSend() {
     final String inputText = _textController.text.trim();
@@ -23,38 +61,64 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     setState(() {});
   }
 
+  Future<void> _toggleListening() async {
+    if (_isListening) {
+      await _voiceService.stopListening();
+    } else {
+      await _voiceService.startListening();
+    }
+  }
+
   Widget _buildSearchField() {
-      return Container(
-        color: Colors.white,
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 20, bottom: 30),
-        child:  TextField(
-          controller: _textController,
-          textInputAction: TextInputAction.send,
-          onSubmitted: (_) => _handleSend(),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[200],
-            hintText: 'Search',
-            hintStyle: const TextStyle(
-              color: Colors.grey,
-            ),
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.send_rounded),
-              color: const Color(0xff7A86F8),
-              onPressed: _handleSend,
-              tooltip: 'Send',
-            ),
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 20, bottom: 30),
+      child: TextField(
+        controller: _textController,
+        textInputAction: TextInputAction.send,
+        onSubmitted: (_) => _handleSend(),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[200],
+          hintText: 'Type or speak a message',
+          hintStyle: const TextStyle(
+            color: Colors.grey,
+          ),
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(
+                  _isListening ? Icons.mic : Icons.mic_none_rounded,
+                  color: _isListening ? Colors.red : const Color(0xff7A86F8),
+                ),
+                onPressed: _toggleListening,
+                tooltip: _isListening ? 'Stop listening' : 'Speak',
+              ),
+              IconButton(
+                icon: const Icon(Icons.send_rounded),
+                color: const Color(0xff7A86F8),
+                onPressed: _handleSend,
+                tooltip: 'Send',
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 
   @override
   void dispose() {
+    _speechSubscription?.cancel();
+    _listeningSubscription?.cancel();
+    _messageSubscription?.cancel();
+    _voiceService.stopListening();
+    _voiceService.stopSpeaking();
     _textController.dispose();
     super.dispose();
   }
