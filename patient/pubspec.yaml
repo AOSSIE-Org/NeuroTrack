@@ -77,6 +77,9 @@ dependencies:
   get_it: ^8.2.0
   rxdart: ^0.28.0
 
+  # Voice features
+  speech_to_text: ^7.0.0
+  flutter_tts: ^3.8.5
 dev_dependencies:
   flutter_test:
     sdk: flutter
