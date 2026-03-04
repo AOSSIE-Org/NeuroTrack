@@ -15,6 +15,7 @@ class VoiceService {
   bool _isListening = false;
   bool _isSpeaking = false;
   bool _isInitialized = false;
+  bool _isSttAvailable = false;
   
   final StreamController<String> _speechController = StreamController<String>.broadcast();
   final StreamController<bool> _listeningController = StreamController<bool>.broadcast();
@@ -31,7 +32,7 @@ class VoiceService {
     if (_isInitialized) return;
     
     try {
-      await _speechToText.initialize(
+      _isSttAvailable = await _speechToText.initialize(
         onError: (error) {
           debugPrint('Speech to Text Error: $error');
           _isListening = false;
@@ -77,10 +78,9 @@ class VoiceService {
     if (!_isInitialized) await initialize();
     
     if (_isListening) return false;
+    if (!_isSttAvailable) return false;
     
     try {
-      bool available = await _speechToText.initialize();
-      if (!available) return false;
       
       await _speechToText.listen(
         onResult: (result) {
