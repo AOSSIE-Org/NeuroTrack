@@ -6,7 +6,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 class VoiceService {
   static final VoiceService _instance = VoiceService._internal();
   static VoiceService get instance => _instance;
-  
+
   VoiceService._internal();
 
   final SpeechToText _speechToText = SpeechToText();
@@ -16,6 +16,7 @@ class VoiceService {
   bool _isSpeaking = false;
   bool _isInitialized = false;
   bool _isSttAvailable = false;
+  bool _isDisposed = false;
   
   final StreamController<String> _speechController = StreamController<String>.broadcast();
   final StreamController<bool> _listeningController = StreamController<bool>.broadcast();
@@ -28,6 +29,24 @@ class VoiceService {
   bool get isListening => _isListening;
   bool get isSpeaking => _isSpeaking;
 
+  void _emitListening(bool value) {
+    if (!_isDisposed && !_listeningController.isClosed) {
+      _listeningController.add(value);
+    }
+  }
+
+  void _emitSpeaking(bool value) {
+    if (!_isDisposed && !_speakingController.isClosed) {
+      _speakingController.add(value);
+    }
+  }
+
+  void _emitSpeech(String value) {
+    if (!_isDisposed && !_speechController.isClosed) {
+      _speechController.add(value);
+    }
+  }
+
   Future<void> initialize() async {
     if (_isInitialized) return;
     
@@ -36,13 +55,13 @@ class VoiceService {
         onError: (error) {
           debugPrint('Speech to Text Error: $error');
           _isListening = false;
-          _listeningController.add(_isListening);
+          _emitListening(_isListening);
         },
         onStatus: (status) {
           debugPrint('Speech to Text Status: $status');
           if (status == 'done' || status == 'notListening') {
             _isListening = false;
-            _listeningController.add(_isListening);
+            _emitListening(_isListening);
           }
         },
       );
@@ -54,18 +73,18 @@ class VoiceService {
       
       _flutterTts.setStartHandler(() {
         _isSpeaking = true;
-        _speakingController.add(_isSpeaking);
+        _emitSpeaking(_isSpeaking);
       });
       
       _flutterTts.setCompletionHandler(() {
         _isSpeaking = false;
-        _speakingController.add(_isSpeaking);
+        _emitSpeaking(_isSpeaking);
       });
       
       _flutterTts.setErrorHandler((message) {
         debugPrint('TTS Error: $message');
         _isSpeaking = false;
-        _speakingController.add(_isSpeaking);
+        _emitSpeaking(_isSpeaking);
       });
 
       _isInitialized = true;
@@ -85,7 +104,7 @@ class VoiceService {
       await _speechToText.listen(
         onResult: (result) {
           if (result.finalResult) {
-            _speechController.add(result.recognizedWords);
+            _emitSpeech(result.recognizedWords);
           }
         },
         listenFor: const Duration(seconds: 30),
@@ -98,7 +117,7 @@ class VoiceService {
       );
       
       _isListening = true;
-      _listeningController.add(_isListening);
+      _emitListening(_isListening);
       return true;
     } catch (e) {
       debugPrint('Start listening error: $e');
@@ -111,7 +130,7 @@ class VoiceService {
     
     await _speechToText.stop();
     _isListening = false;
-    _listeningController.add(_isListening);
+    _emitListening(_isListening);
   }
 
   Future<void> speak(String text) async {
@@ -134,9 +153,13 @@ class VoiceService {
     }
   }
 
-  void dispose() {
-    _speechController.close();
-    _listeningController.close();
-    _speakingController.close();
+  Future<void> dispose() async {
+    if (_isDisposed) return;
+    _isDisposed = true;
+    await _speechToText.stop();
+    await _flutterTts.stop();
+    await _speechController.close();
+    await _listeningController.close();
+    await _speakingController.close();
   }
 }

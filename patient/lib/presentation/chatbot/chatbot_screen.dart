@@ -17,7 +17,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   final VoiceService _voiceService = VoiceService.instance;
 
   bool _isListening = false;
-  String _lastSpokenText = '';
+  int _lastSpokenMessageCount = 0;
 
   StreamSubscription<String>? _speechSubscription;
   StreamSubscription<bool>? _listeningSubscription;
@@ -42,10 +42,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     _messageSubscription = ChatManager.instance.messageStream.skip(1).listen((messages) {
       if (messages.isEmpty) return;
       final last = messages.last;
-      if (last.type != ChatMessageType.user &&
-          last.type != ChatMessageType.typing &&
-          last.text != _lastSpokenText) {
-        _lastSpokenText = last.text;
+      if (messages.length > _lastSpokenMessageCount &&
+          last.type != ChatMessageType.user &&
+          last.type != ChatMessageType.typing) {
+        _lastSpokenMessageCount = messages.length;
         _voiceService.speak(last.text);
       }
     });
@@ -65,7 +65,15 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     if (_isListening) {
       await _voiceService.stopListening();
     } else {
-      await _voiceService.startListening();
+      final started = await _voiceService.startListening();
+      if (!started && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Microphone unavailable. Please check permissions.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 
