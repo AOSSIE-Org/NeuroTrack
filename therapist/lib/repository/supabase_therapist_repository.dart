@@ -54,9 +54,14 @@ class SupabaseTherapistRepository implements TherapistRepository {
   @override
   Future<ActionResult> changeAppointmentStatus(String appointmentId, String status) async {
     try {
-      await _supabaseClient.from('session')
+      final response = await _supabaseClient.from('session')
       .update({'status': status})
-      .eq('id', appointmentId);
+      .eq('id', appointmentId)
+      .eq('therapist_id', _supabaseClient.auth.currentUser!.id)
+      .select();
+      if (response.isEmpty) {
+        return ActionResultFailure(errorMessage: 'Session not found or not authorized', statusCode: 404);
+      }
   
      return ActionResultSuccess(data: 'Appointment Update Successfully', statusCode: 200);
     } catch(e) {
