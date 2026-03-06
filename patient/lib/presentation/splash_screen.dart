@@ -34,7 +34,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (session != null) {
       // User already has an active session — resolve their onboarding status
-      await context.read<AuthProvider>().checkIfPatientExists();
+      try {
+        await context.read<AuthProvider>().checkIfPatientExists();
+      } catch (_) {
+        if (!mounted) return;
+        SnackbarService.showError('Something went wrong. Please sign in again.');
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const AuthScreen()),
+        );
+        return;
+      }
       if (!mounted) return;
 
       final authProvider = context.read<AuthProvider>();
