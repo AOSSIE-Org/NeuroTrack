@@ -5,6 +5,7 @@ import 'package:patient/presentation/auth/auth_screen.dart';
 import 'package:patient/presentation/auth/consultation_request_screen.dart';
 import 'package:patient/presentation/auth/personal_details_screen.dart';
 import 'package:patient/presentation/home/home_screen.dart';
+import 'package:patient/presentation/widgets/snackbar_service.dart';
 import 'package:patient/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -50,6 +51,10 @@ class _SplashScreenState extends State<SplashScreen> {
       } else if (status.isInitialConsultation) {
         nextScreen = const ConsultationRequestScreen();
       } else {
+        // error or unknown — fall back to sign-in with feedback
+        if (status.isError) {
+          SnackbarService.showError('Something went wrong. Please sign in again.');
+        }
         nextScreen = const AuthScreen();
       }
 
