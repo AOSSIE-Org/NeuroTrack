@@ -62,6 +62,13 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         // error or unknown — fall back to sign-in with feedback
         if (status.isError) {
+          try {
+            await Supabase.instance.client.auth.signOut();
+          } catch (_) {
+            // Network unavailable — clear local token only
+            await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
+          }
+          if (!mounted) return;
           SnackbarService.showError('Something went wrong. Please sign in again.');
         }
         nextScreen = const AuthScreen();
