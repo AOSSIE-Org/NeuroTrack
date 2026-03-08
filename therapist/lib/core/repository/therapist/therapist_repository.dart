@@ -68,6 +68,10 @@ abstract interface class TherapistRepository {
   /// 
   /// - **Exceptions:**
   /// - If an error occurs while updating the record, it is caught and returned as a failure.
+  /// - **Returns:**
+  /// - [ActionResultSuccess] with statusCode 200 if the session was updated successfully.
+  /// - [ActionResultFailure] with statusCode 404 if the session was not found or does not belong to the authenticated therapist.
+  /// - [ActionResultFailure] with statusCode 400 if an exception occurs.
 
   Future<ActionResult> changeAppointmentStatus(String appointmentId, String status);
 
