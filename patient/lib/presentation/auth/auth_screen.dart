@@ -24,7 +24,6 @@ class _AuthScreenState extends State<AuthScreen> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
   late Timer _timer;
-  bool hasNavigated = false;
   final supabase = Supabase.instance.client;
   StreamSubscription<AuthState>? _authSubscription;
 
@@ -58,6 +57,7 @@ class _AuthScreenState extends State<AuthScreen> {
       final session = supabase.auth.currentSession;
       if (session != null && mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
           _handleSuccessfulAuth(session);
         });
       }
@@ -95,40 +95,45 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void _handleNavigation(AuthNavigationStatus status) {
+    Widget? nextScreen;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = context.read<AuthProvider>();
-      Widget? nextScreen;
+    if (status.isHome) {
+      final userName =
+      supabase.auth.currentSession?.user.userMetadata?['full_name'];
+      nextScreen = HomeScreen(userName: userName ?? 'User');
+    } else if (status.isPersonalDetails) {
+      nextScreen = const PersonalDetailsScreen();
+    } else if (status.isAssessment) {
+      nextScreen = const AssessmentsListScreen();
+    } else if (status.isInitialConsultation) {
+      nextScreen = const ConsultationRequestScreen();
+    } else if (status.isError) {
+      SnackbarService.showError('An error occurred. Please try again.');
+      context.read<AuthProvider>().resetNavigationStatus();
+      return;
+    }
 
-      if (authProvider.authNavigationStatus.isHome) {
-        final userName =
-            supabase.auth.currentSession?.user.userMetadata?['full_name'];
-        nextScreen = HomeScreen(userName: userName ?? 'User');
-      } else if (authProvider.authNavigationStatus.isPersonalDetails) {
-        nextScreen = const PersonalDetailsScreen();
-      } else if(authProvider.authNavigationStatus.isAssessment) {
-        nextScreen = const AssessmentsListScreen();
-      } else if(authProvider.authNavigationStatus.isInitialConsultation) {
-        nextScreen = const ConsultationRequestScreen();
-      } else if (authProvider.authNavigationStatus.isError) {
-        SnackbarService.showError('An error occurred. Please try again.');
-        return;
-      }
-
-      if (nextScreen != null) {
-        context.read<AuthProvider>().resetNavigationStatus();
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => nextScreen!));
-      }
-    });
+    if (nextScreen != null) {
+      context.read<AuthProvider>().resetNavigationStatus();
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => nextScreen!));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AuthProvider>(context, listen: true).authNavigationStatus;
+    final status = context.watch<AuthProvider>().authNavigationStatus;
+
+    if (!status.isUnknown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final latestStatus =
+            context.read<AuthProvider>().authNavigationStatus;
+        _handleNavigation(latestStatus);
+      });
+    }
+
     return Scaffold(
       body: Column(
         children: [
@@ -154,7 +159,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       _contents.length,
-                      (index) => _buildDot(index),
+                          (index) => _buildDot(index),
                     ),
                   ),
                 ),
