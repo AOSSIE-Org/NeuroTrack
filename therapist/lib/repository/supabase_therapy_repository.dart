@@ -316,10 +316,10 @@ class SupabaseTherapyRepository implements TherapyRepository {
     
     await _supabaseClient.from('daily_activity_logs').upsert({
       'activity_id': dailyActivity.id,
-      'date': date.toString(),
+      'date': DateTime(date.year, date.month, date.day).toIso8601String().substring(0, 10),
       'activity_items': dailyActivity.activityList,
       'patient_id': dailyActivity.patientId,
-    }, onConflict: 'activity_id, date, patient_id');
+    }, onConflict: 'activity_id,date,patient_id');
   }
   }
 

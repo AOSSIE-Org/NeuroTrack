@@ -167,6 +167,21 @@ CREATE INDEX idx_session_therapist_id ON session(therapist_id);
 CREATE INDEX idx_session_patient_id ON session(patient_id);
 CREATE INDEX idx_therapy_goal_therapist_id ON therapy_goal(therapist_id);
 CREATE INDEX idx_therapy_goal_patient_id ON therapy_goal(patient_id);
+-- Remove duplicate activity logs before adding unique constraint
+WITH ranked AS (
+  SELECT
+    ctid,
+    ROW_NUMBER() OVER (
+      PARTITION BY activity_id, date, patient_id
+      ORDER BY id
+    ) AS rn
+  FROM daily_activity_logs
+)
+DELETE FROM daily_activity_logs d
+USING ranked r
+WHERE d.ctid = r.ctid
+  AND r.rn > 1;
+
 -- Unique constraint to prevent duplicate activity logs
 ALTER TABLE daily_activity_logs
 ADD CONSTRAINT uq_activity_date_patient
