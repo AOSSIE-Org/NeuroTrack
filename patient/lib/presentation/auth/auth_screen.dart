@@ -128,7 +128,9 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!status.isUnknown) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        _handleNavigation(status);
+        final latestStatus =
+            context.read<AuthProvider>().authNavigationStatus;
+        _handleNavigation(latestStatus);
       });
     }
 
