@@ -314,12 +314,12 @@ class SupabaseTherapyRepository implements TherapyRepository {
     final dayOfWeek = date.weekday % 7; 
     if (!dailyActivity.daysOfWeek.contains(dayOfWeek.toString())) continue;
     
-    await _supabaseClient.from('daily_activity_logs').insert({
+    await _supabaseClient.from('daily_activity_logs').upsert({
       'activity_id': dailyActivity.id,
       'date': date.toString(),
       'activity_items': dailyActivity.activityList,
       'patient_id': dailyActivity.patientId,
-    });
+    }, onConflict: 'activity_id, date, patient_id');
   }
   }
 

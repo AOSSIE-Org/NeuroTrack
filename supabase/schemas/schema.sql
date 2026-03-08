@@ -167,3 +167,7 @@ CREATE INDEX idx_session_therapist_id ON session(therapist_id);
 CREATE INDEX idx_session_patient_id ON session(patient_id);
 CREATE INDEX idx_therapy_goal_therapist_id ON therapy_goal(therapist_id);
 CREATE INDEX idx_therapy_goal_patient_id ON therapy_goal(patient_id);
+-- Unique constraint to prevent duplicate activity logs
+ALTER TABLE daily_activity_logs
+ADD CONSTRAINT uq_activity_date_patient
+UNIQUE (activity_id, date, patient_id);
