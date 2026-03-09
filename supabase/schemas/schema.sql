@@ -49,8 +49,8 @@ CREATE TABLE session (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     timestamp TIMESTAMPTZ NOT NULL,
-    therapist_id UUID REFERENCES therapist(id),
-    patient_id UUID REFERENCES patient(id),
+    therapist_id UUID REFERENCES therapist(id) ON DELETE SET NULL,
+    patient_id UUID REFERENCES patient(id) ON DELETE SET NULL,
     is_consultation BOOLEAN DEFAULT FALSE,
     mode INT2,
     duration INT4,
@@ -59,21 +59,29 @@ CREATE TABLE session (
     declined_reason TEXT,
 );
 
+-- Create the therapy_type table
+CREATE TABLE therapy_type (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    name TEXT NOT NULL UNIQUE,
+    description TEXT
+);
+
 -- Create the therapy_goal table
 CREATE TABLE therapy_goal (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     performed_on TIMESTAMPTZ,
-    therapist_id UUID REFERENCES therapist(id), 
+    therapist_id UUID REFERENCES therapist(id) ON DELETE SET NULL,
     therapy_mode INT2,
     duration INT4,
     therapy_type INT2,
-    therapy_type_id UUID REFERENCES therapy_type(id),
+    therapy_type_id UUID REFERENCES therapy_type(id) ON DELETE SET NULL,
     goals JSONB,
     observations JSONB,
     regressions JSONB,
     activities JSONB,
-    patient_id UUID REFERENCES patient(id)
+    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE
 );
 
 -- Create the assessments table
@@ -93,10 +101,11 @@ CREATE TABLE assessments (
 CREATE TABLE assessment_results (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  assessment_id UUID REFERENCES assessments(id),
-  patient_id UUID REFERENCES auth.users(id),
+  assessment_id UUID REFERENCES assessments(id) ON DELETE CASCADE,
+  patient_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   submission JSONB,
-  result JSONB
+  result JSONB,
+  CONSTRAINT uq_patient_assessment UNIQUE (patient_id, assessment_id)
 );
 
 -- Therapy Table 
@@ -146,8 +155,8 @@ CREATE TABLE daily_activities (
     activity_name TEXT NOT NULL,
     activity_list JSONB,
     is_active BOOLEAN DEFAULT TRUE,
-    therapist_id UUID REFERENCES therapist(id),
-    patient_id UUID REFERENCES patient(id),
+    therapist_id UUID REFERENCES therapist(id) ON DELETE SET NULL,
+    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE,
     start_time TIMESTAMPTZ,
     end_time TIMESTAMPTZ,
     days_of_week INT2[],
@@ -156,7 +165,7 @@ CREATE TABLE daily_activities (
 CREATE TABLE daily_activity_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     activity_id UUID REFERENCES daily_activities(id) ON DELETE CASCADE,
-    date TIMESTAMPTZ NOT NULL,
+    date DATE NOT NULL,
     activity_items JSONB NOT NULL
     patient_id UUID REFERENCES patient(id) ON DELETE CASCADE,
 );

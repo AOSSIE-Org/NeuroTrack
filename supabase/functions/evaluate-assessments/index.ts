@@ -203,12 +203,12 @@ Deno.serve(async (req) => {
 
     const { error: insertError } = await supabase
       .from("assessment_results")
-      .insert({
+      .upsert({
         assessment_id: assessment_id,
         submission: answered_questions,
         patient_id: patient_id,
         result: responseData,
-      });
+      }, { onConflict: 'patient_id,assessment_id', ignoreDuplicates: true });
 
     if (insertError) {
       const code = (insertError as { code?: string }).code;
