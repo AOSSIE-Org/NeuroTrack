@@ -50,7 +50,8 @@ class SupabaseAuthRepository implements AuthRepository {
           'id': user.id,
           'email': user.email,
           'name': user.userMetadata?['full_name'] ?? '',
-          'is_new_user': isNewUser, // Add this flag
+          'phone': (therapistData?['phone'] as String?) ?? '',
+          'is_new_user': isNewUser,
         },
         statusCode: 200,
       );

@@ -3,30 +3,37 @@ import 'package:flutter/material.dart';
 class ProfileOption extends StatelessWidget {
   final String title;
   final bool isLogout;
+  final VoidCallback? onTap;
 
-  const ProfileOption({super.key, required this.title, this.isLogout = false});
+  const ProfileOption({
+    super.key,
+    required this.title,
+    this.isLogout = false,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           title: Text(
             title,
             style: TextStyle(
               fontSize: 16,
-              color: isLogout ? Colors.red : Colors.black,
-              fontWeight: isLogout ? FontWeight.bold : FontWeight.normal,
+              color: isLogout ? const Color(0xFFEF4444) : Colors.black,
+              fontWeight: isLogout ? FontWeight.w500 : FontWeight.normal,
             ),
           ),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-          onTap: () {},
-        ),
-        if (!isLogout)
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Divider(height: 2, thickness: 1),
+          trailing: Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: isLogout ? const Color(0xFFEF4444) : Colors.black87,
           ),
+          onTap: onTap ?? () {},
+        ),
+        const Divider(height: 1, thickness: 1, indent: 0, endIndent: 0),
       ],
     );
   }
