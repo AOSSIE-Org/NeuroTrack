@@ -19,6 +19,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   final nameController = TextEditingController();
   final ageController = TextEditingController();
   final licenseController = TextEditingController();
+  final phoneController = TextEditingController();
   String selectedGender = '';
   List<String> selectedTherapies = [];
 
@@ -47,6 +48,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     nameController.dispose();
     ageController.dispose();
     licenseController.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
@@ -107,7 +109,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     );
 
                     // Save to Supabase
-                    final success = await authProvider.storePersonalInfo(personalInfo);
+                    final success = await authProvider.storePersonalInfo(
+                      personalInfo,
+                      phone: phoneController.text.trim(),
+                    );
 
                     if (success) {
                       // Navigate to home screen
@@ -177,6 +182,19 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     }
                     if (value.length < 3) {
                       return 'Name must be at least 3 characters';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                _buildTextField(
+                  label: 'Phone Number',
+                  controller: phoneController,
+                  hintText: 'Enter your phone number',
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter your phone number';
                     }
                     return null;
                   },
