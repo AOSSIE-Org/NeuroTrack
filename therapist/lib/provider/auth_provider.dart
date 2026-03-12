@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:therapist/core/entities/auth_entities/therapist_personal_info_entity.dart';
 import 'package:therapist/core/repository/auth/auth_repository.dart';
 import 'package:therapist/core/result/result.dart';
@@ -31,7 +33,10 @@ class AuthProvider extends ChangeNotifier {
   String? _userEmail;
   String? get userEmail => _userEmail;
 
-  late String _userName;
+  String _userPhone = '';
+  String get userPhone => _userPhone;
+
+  String _userName = '';
   String get userName => _userName;
 
   bool _isNewUser = true;
@@ -52,6 +57,7 @@ class AuthProvider extends ChangeNotifier {
         final userData = result.data as Map<String, dynamic>;
         _userEmail = userData['email'];
         _userName = userData['name'];
+        _userPhone = (userData['phone'] as String?) ?? '';
         _isNewUser = userData['is_new_user'] ?? true; // Store if user is new
         
         _errorMessage = '';
@@ -126,6 +132,20 @@ class AuthProvider extends ChangeNotifier {
 
   Map<String, dynamic>? getUserMetadata() {
     return _supabaseClient.auth.currentSession?.user.userMetadata;
+  }
+
+  Future<void> signOut() async {
+    try {
+      if (!kIsWeb) await GoogleSignIn().signOut();
+      await _supabaseClient.auth.signOut();
+    } catch (_) {}
+    _isAuthenticated = false;
+    _userId = null;
+    _userEmail = null;
+    _userPhone = '';
+    _userName = '';
+    _isNewUser = true;
+    notifyListeners();
   }
 
   void navigateBasedOnUserStatus(BuildContext context) {
