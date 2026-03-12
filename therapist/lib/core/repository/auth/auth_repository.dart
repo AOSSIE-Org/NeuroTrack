@@ -23,7 +23,7 @@ abstract interface class AuthRepository {
   /// - **Exceptions:**
   /// - If an error occurs while inserting the record, it is caught and returned as a failure.
 
-  Future<ActionResult> storePersonalInfo(TherapistPersonalInfoEntity personalInfoEntity);
+  Future<ActionResult> storePersonalInfo(TherapistPersonalInfoEntity personalInfoEntity, {required String phone});
   Future<String?> getUserId();
   
   // Add this new method

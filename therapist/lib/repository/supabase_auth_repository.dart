@@ -50,7 +50,8 @@ class SupabaseAuthRepository implements AuthRepository {
           'id': user.id,
           'email': user.email,
           'name': user.userMetadata?['full_name'] ?? '',
-          'is_new_user': isNewUser, // Add this flag
+          'phone': (therapistData?['phone'] as String?) ?? '',
+          'is_new_user': isNewUser,
         },
         statusCode: 200,
       );
@@ -101,7 +102,7 @@ class SupabaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<ActionResult> storePersonalInfo(TherapistPersonalInfoEntity personalInfoEntity) async {
+  Future<ActionResult> storePersonalInfo(TherapistPersonalInfoEntity personalInfoEntity, {required String phone}) async {
     try {
       // Get the current authenticated user
       final currentUser = _supabaseClient.auth.currentUser;
@@ -116,7 +117,9 @@ class SupabaseAuthRepository implements AuthRepository {
       
       // Create data with user ID explicitly set
       final data = {
-        'id': currentUser.id,  // THIS IS THE KEY FIX
+        'id': currentUser.id,
+        'email': currentUser.email ?? '',
+        'phone': phone,
         ...personalInfoEntity.toMap(),
       };
       
