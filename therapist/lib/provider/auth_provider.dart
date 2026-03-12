@@ -99,6 +99,24 @@ class AuthProvider extends ChangeNotifier {
   Future<void> checkAuthentication() async {
     _userId = await _authRepository.getUserId();
     _isAuthenticated = _userId != null;
+
+    if (_isAuthenticated) {
+      final user = _supabaseClient.auth.currentUser;
+      _userEmail = user?.email;
+      _userName = (user?.userMetadata?['full_name'] as String?) ?? '';
+
+      try {
+        final row = await _supabaseClient
+            .from('therapist')
+            .select('phone')
+            .eq('id', _userId!)
+            .maybeSingle();
+        _userPhone = (row?['phone'] as String?) ?? '';
+      } catch (_) {
+        _userPhone = '';
+      }
+    }
+
     notifyListeners();
   }
 
