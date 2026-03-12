@@ -54,6 +54,7 @@ class ProfileScreen extends StatelessWidget {
     final phone = auth.userPhone;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -72,7 +73,7 @@ class ProfileScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 32.0),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF2EAF5),
                   borderRadius: BorderRadius.circular(20),
