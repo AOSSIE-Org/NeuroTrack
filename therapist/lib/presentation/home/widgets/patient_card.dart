@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:therapist/presentation/therapy_goals/therapy_goals_screen.dart';
 import 'package:therapist/presentation/therapy_goals/therapy_home_screen.dart';
 
 class PatientCard extends StatelessWidget {

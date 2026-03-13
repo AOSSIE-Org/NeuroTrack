@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:therapist/core/entities/consultation/consultation_request_entity.dart';
 import 'package:therapist/core/repository/consultation/consultation_repository.dart';
 import 'package:therapist/core/result/result.dart';
 import 'package:therapist/core/utils/api_status_enum.dart';

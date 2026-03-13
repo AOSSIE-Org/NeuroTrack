@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:therapist/presentation/auth/personal_details_screen.dart';
 import 'package:therapist/presentation/auth/widgets/google_signin_button.dart';
-import '../home/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:therapist/provider/auth_provider.dart';
 

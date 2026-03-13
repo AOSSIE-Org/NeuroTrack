@@ -1,17 +1,11 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:therapist/core/entities/therapy_entities/therapy_entities.dart';
-import 'package:therapist/core/entities/therapy_entities/therapy_type_entity.dart';
 import 'package:therapist/core/result/result.dart';
 import 'package:therapist/model/therapy_models/therapy_models.dart';
 import 'package:uuid/uuid.dart';
 
-import '../core/entities/daily_activity_entities/daily_activity_model.dart' show DailyActivityModel;
 import '../core/entities/daily_activity_entities/daily_activity_response.dart' show DailyActivityResponse, DailyActivityResponseMapper;
 import '../core/repository/repository.dart';
-import '../model/daily_activities/daily_activity_response_model.dart';
 
 class SupabaseTherapyRepository implements TherapyRepository {
   final _supabaseClient = Supabase.instance.client;

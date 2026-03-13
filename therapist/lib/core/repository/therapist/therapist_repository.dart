@@ -1,5 +1,4 @@
 import 'package:therapist/core/result/action_result.dart';
-import 'package:therapist/core/models/profession_model.dart';
 
 abstract interface class TherapistRepository {
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:therapist/core/entities/auth_entities/therapist_personal_info_entity.dart';
 import 'package:therapist/core/models/profession_model.dart';
 import 'package:therapist/core/repository/therapist/therapist_repository.dart';
 import 'package:therapist/core/result/result.dart';
