@@ -147,11 +147,6 @@ class AppointmentsProvider extends ChangeNotifier {
     }
   }
 
-  /// Helper method to format `TimeOfDay` into readable string.
-  String _formatTimeOfDay(TimeOfDay time, BuildContext context) {
-    return MaterialLocalizations.of(context).formatTimeOfDay(time);
-  }
-
   // Fetch all appointments from the patient repository
   Future<void> fetchAllAppointments() async {
     try {

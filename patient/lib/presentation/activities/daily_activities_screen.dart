@@ -17,7 +17,6 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
   late DateTime today;
   late AnimationController _progressController;
   late Animation<double> _progressAnimation;
-  double _prevProgress = 0.0;
 
   @override
   void initState() {
@@ -36,21 +35,6 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
   void dispose() {
     _progressController.dispose();
     super.dispose();
-  }
-
-  void _animateProgress(double end) {
-    setState(() {
-      _progressAnimation = Tween<double>(
-        begin: _prevProgress,
-        end: end,
-      ).animate(CurvedAnimation(
-        parent: _progressController,
-        curve: Curves.easeInOut,
-      ));
-
-      _prevProgress = end;
-      _progressController.forward(from: 0.0);
-    });
   }
 
   @override
