@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:patient/core/core.dart';
-import 'package:patient/core/entities/auth_entities/personal_info_entity.dart';
-import 'package:patient/core/result/result.dart';
 
 abstract interface class AuthRepository {
   // The abstract repository class will define the methods that the repository must implement.

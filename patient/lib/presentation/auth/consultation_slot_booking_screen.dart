@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:patient/presentation/auth/widgets/slot_booking_card.dart';
-import 'package:patient/provider/auth_provider.dart';
-import 'package:provider/provider.dart';
 
 class ConsultationSlotBookingScreen extends StatelessWidget {
   const ConsultationSlotBookingScreen({
