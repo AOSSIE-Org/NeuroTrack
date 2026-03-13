@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:therapist/core/entities/consultation/consultation_request_entity.dart';
 import 'package:therapist/model/consultation/consultation_request_model.dart';
-import 'package:therapist/provider/consultation_provider.dart';
 
 class ConsultationRequestDetailScreen extends StatefulWidget {
   final ConsultationRequestModel request;
