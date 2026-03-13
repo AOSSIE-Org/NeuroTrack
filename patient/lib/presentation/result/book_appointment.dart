@@ -46,18 +46,19 @@ class _TherapistDetailsScreenState extends State<TherapistDetailsScreen> {
       lastDate: DateTime.now().add(const Duration(days: 30)), // Allow booking for 30 days
     );
 
+    if (!mounted) return;
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
         selectedTimeSlot = null; // Reset time slot when date changes
       });
 
-      _selectTimeSlot(context);
+      _selectTimeSlot();
     }
   }
 
   // Function to select a 30-minute time slot
-  void _selectTimeSlot(BuildContext context) {
+  void _selectTimeSlot() {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext ctx) {
