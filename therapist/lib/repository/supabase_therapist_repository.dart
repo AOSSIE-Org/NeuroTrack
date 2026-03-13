@@ -110,7 +110,6 @@ class SupabaseTherapistRepository implements TherapistRepository {
     }
   }
   
-  @override
   Future<ActionResult> getAllSessionsWithPatientDetails() async {
     try {
       final response = await _supabaseClient.from('session')
