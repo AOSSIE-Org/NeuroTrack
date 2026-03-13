@@ -62,10 +62,12 @@ class TherapistProvider with ChangeNotifier {
         "status": "pending"
       });
 
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Appointment booked successfully!"))
       );
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error booking appointment: $e"))
       );
