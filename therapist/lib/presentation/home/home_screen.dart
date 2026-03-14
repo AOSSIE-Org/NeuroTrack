@@ -38,6 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
           .fetchConsultationRequests();
       Provider.of<TherapistDataProvider>(context, listen: false)
           .fetchPatientsMappedToTherapist();
+      Provider.of<TherapistDataProvider>(context, listen: false)
+          .fetchDashboardStats();
     });
 
     _refreshTimer = Timer.periodic(const Duration(minutes: 3), (_) {
@@ -224,28 +226,32 @@ class HomeContent extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  StatsCard(
-                    imagePath: 'assets/icon1.png',
-                    backgroundColor: Color(0xFFFEE8E8),
-                    label: 'Patients',
-                    value: '02',
-                  ),
-                  StatsCard(
-                    imagePath: 'assets/icon2.png',
-                    backgroundColor: Color(0xFFF1E8FE),
-                    label: 'Sessions',
-                    value: '20',
-                  ),
-                  StatsCard(
-                    imagePath: 'assets/icon3.png',
-                    backgroundColor: Color(0xFFE8FEF0),
-                    label: 'Therapies',
-                    value: '13',
-                  ),
-                ],
+              child: Consumer<TherapistDataProvider>(
+                builder: (context, provider, _) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      StatsCard(
+                        imagePath: 'assets/icon1.png',
+                        backgroundColor: const Color(0xFFFEE8E8),
+                        label: 'Patients',
+                        value: provider.totalPatients.toString().padLeft(2, '0'),
+                      ),
+                      StatsCard(
+                        imagePath: 'assets/icon2.png',
+                        backgroundColor: const Color(0xFFF1E8FE),
+                        label: 'Sessions',
+                        value: provider.totalSessions.toString().padLeft(2, '0'),
+                      ),
+                      StatsCard(
+                        imagePath: 'assets/icon3.png',
+                        backgroundColor: const Color(0xFFE8FEF0),
+                        label: 'Therapies',
+                        value: provider.totalTherapies.toString().padLeft(2, '0'),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),
