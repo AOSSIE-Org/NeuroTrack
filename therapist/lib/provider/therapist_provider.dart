@@ -98,6 +98,39 @@ class TherapistDataProvider extends ChangeNotifier {
   ApiStatus _patientsStatus = ApiStatus.initial;
   ApiStatus get patientsStatus => _patientsStatus;
 
+  // Dashboard stats
+  int _totalPatients = 0;
+  int get totalPatients => _totalPatients;
+  int _totalSessions = 0;
+  int get totalSessions => _totalSessions;
+  int _totalTherapies = 0;
+  int get totalTherapies => _totalTherapies;
+  ApiStatus _statsStatus = ApiStatus.initial;
+  ApiStatus get statsStatus => _statsStatus;
+
+  Future<void> fetchDashboardStats() async {
+    _statsStatus = ApiStatus.loading;
+    notifyListeners();
+
+    try {
+      final results = await Future.wait([
+        _therapistRepository.getTotalPatients(),
+        _therapistRepository.getTotalSessions(),
+        _therapistRepository.getTotalTherapies(),
+      ]);
+
+      if (results[0] is ActionResultSuccess) _totalPatients = results[0].data;
+      if (results[1] is ActionResultSuccess) _totalSessions = results[1].data;
+      if (results[2] is ActionResultSuccess) _totalTherapies = results[2].data;
+
+      _statsStatus = ApiStatus.success;
+    } catch (e) {
+      _statsStatus = ApiStatus.failure;
+      _errorMessage = e.toString();
+    }
+    notifyListeners();
+  }
+
   // Fetch professions
   Future<void> fetchProfessions() async {
     _isLoading = true;

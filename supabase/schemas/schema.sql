@@ -167,3 +167,64 @@ CREATE INDEX idx_session_therapist_id ON session(therapist_id);
 CREATE INDEX idx_session_patient_id ON session(patient_id);
 CREATE INDEX idx_therapy_goal_therapist_id ON therapy_goal(therapist_id);
 CREATE INDEX idx_therapy_goal_patient_id ON therapy_goal(patient_id);
+
+-- ==========================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- ==========================================
+
+-- Enable RLS on all tables
+ALTER TABLE patient ENABLE ROW LEVEL SECURITY;
+ALTER TABLE therapist ENABLE ROW LEVEL SECURITY;
+ALTER TABLE package ENABLE ROW LEVEL SECURITY;
+ALTER TABLE session ENABLE ROW LEVEL SECURITY;
+ALTER TABLE therapy_goal ENABLE ROW LEVEL SECURITY;
+ALTER TABLE assessments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE assessment_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE therapy ENABLE ROW LEVEL SECURITY;
+ALTER TABLE goal_master ENABLE ROW LEVEL SECURITY;
+ALTER TABLE observation_master ENABLE ROW LEVEL SECURITY;
+ALTER TABLE regression_master ENABLE ROW LEVEL SECURITY;
+ALTER TABLE activity_master ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_activities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_activity_logs ENABLE ROW LEVEL SECURITY;
+
+-- PATIENT POLICIES
+-- Patients can view and update their own data. Therapists can view their assigned patients.
+CREATE POLICY "Patients can view own data" ON patient FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Patients can update own data" ON patient FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Therapists can view assigned patients" ON patient FOR SELECT USING (auth.uid() = therapist_id);
+
+-- THERAPIST POLICIES
+-- Therapists can view and update their own data. Patients can view therapist profiles.
+CREATE POLICY "Therapists can view own data" ON therapist FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Therapists can update own data" ON therapist FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Patients can view therapist profiles" ON therapist FOR SELECT USING (true);
+
+-- SESSION POLICIES
+-- Users can read, insert, and update their own sessions (as patient or therapist)
+CREATE POLICY "Users can manage their own sessions" ON session FOR ALL USING (auth.uid() = patient_id OR auth.uid() = therapist_id);
+
+-- THERAPY GOAL POLICIES
+-- Users can read and update their own therapy goals
+CREATE POLICY "Users can manage their therapy goals" ON therapy_goal FOR ALL USING (auth.uid() = patient_id OR auth.uid() = therapist_id);
+
+-- ASSESSMENT RESULTS POLICIES
+-- Patients can read and insert their own assessment results.
+CREATE POLICY "Patients can read own assessment results" ON assessment_results FOR SELECT USING (auth.uid() = patient_id);
+CREATE POLICY "Patients can insert own assessment results" ON assessment_results FOR INSERT WITH CHECK (auth.uid() = patient_id);
+CREATE POLICY "Therapists can view assessment results of their patients" ON assessment_results FOR SELECT USING (
+  EXISTS (SELECT 1 FROM patient WHERE patient.id = assessment_results.patient_id AND patient.therapist_id = auth.uid())
+);
+
+-- DAILY ACTIVITIES POLICIES
+CREATE POLICY "Users can manage daily activities" ON daily_activities FOR ALL USING (auth.uid() = patient_id OR auth.uid() = therapist_id);
+CREATE POLICY "Users can manage daily activity logs" ON daily_activity_logs FOR ALL USING (auth.uid() = patient_id);
+
+-- PUBLIC READ-ONLY MASTER TABLES (Assessments, Therapies, Goals, etc.)
+CREATE POLICY "Anyone can view assessments" ON assessments FOR SELECT USING (true);
+CREATE POLICY "Anyone can view therapies" ON therapy FOR SELECT USING (true);
+CREATE POLICY "Anyone can view goal_master" ON goal_master FOR SELECT USING (true);
+CREATE POLICY "Anyone can view observation_master" ON observation_master FOR SELECT USING (true);
+CREATE POLICY "Anyone can view regression_master" ON regression_master FOR SELECT USING (true);
+CREATE POLICY "Anyone can view activity_master" ON activity_master FOR SELECT USING (true);
+CREATE POLICY "Anyone can view packages" ON package FOR SELECT USING (true);
