@@ -54,6 +54,16 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> updateActivityInBackground() async {
+    if (_allTasks.isNotEmpty) {
+      await _patientRepository.updateActivityCompletion(
+        tasks: _allTasks,
+        activityId: _activityId,
+        activitySetId: _activitySetId,
+      );
+    }
+  }
+
   DateTime get selectedDate => _selectedDate;
 
   void setSelectedDate(DateTime date) {

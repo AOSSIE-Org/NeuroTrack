@@ -283,21 +283,31 @@ class SupabaseTherapyRepository implements TherapyRepository {
   @override
   Future<ActionResult> addOrUpdateDailyActivity(DailyActivityResponse dailyActivity) async {
     try {
+      final isUpdate = dailyActivity.id.isNotEmpty;
+      final activityId = isUpdate ? dailyActivity.id : const Uuid().v4();
+      
       final updatedDailyActivity = dailyActivity.copyWith(
         therapistId: _supabaseClient.auth.currentUser!.id,
-        id: const Uuid().v4(),
+        id: activityId,
       );
-      if(dailyActivity.id.isNotEmpty) {
+
+      if(isUpdate) {
         await _supabaseClient.from('daily_activities').update(
           updatedDailyActivity.toMap()
-        ).eq('id', dailyActivity.id);
+        ).eq('id', activityId);
       } else {
         await _supabaseClient.from('daily_activities').insert(
           updatedDailyActivity.toMap()
         );
       }
-      _addDailyActivityLog(updatedDailyActivity);
-      return ActionResultSuccess(data: 'Daily Activity Added Successfully', statusCode: 200);
+      
+      // Only add logs for new activities to avoid duplicates on update
+      // Or we could clear and recreate, but usually logs are generated once for the schedule
+      if (!isUpdate) {
+        await _addDailyActivityLog(updatedDailyActivity);
+      }
+      
+      return ActionResultSuccess(data: 'Daily Activity ${isUpdate ? 'Updated' : 'Added'} Successfully', statusCode: 200);
     } catch (e) {
       return ActionResultFailure(errorMessage: e.toString(), statusCode: 500);
     }
