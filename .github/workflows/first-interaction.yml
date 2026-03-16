@@ -1,0 +1,42 @@
+name: First Interaction
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            👋 **Welcome to NeuroTrack!**
+            
+            Thank you for opening your first issue! We're excited to have you as part of our community. 🎉
+            
+            A maintainer will review your issue soon. In the meantime, please make sure you've provided all the necessary details to help us understand and address the issue effectively.
+            
+            If you'd like to contribute code, check out our [Contributing Guidelines](../CONTRIBUTING.md) to get started.
+            
+            Happy coding! 🚀
+          pr-message: |
+            🎉 **Congratulations on your first Pull Request!**
+            
+            Thank you for contributing to NeuroTrack! We really appreciate your effort and time. 💙
+            
+            Our team will review your PR as soon as possible. Here are some things that might help:
+            
+            - Make sure all tests pass ✅
+            - Ensure your code follows our coding standards 📝
+            - Check that your PR description clearly explains what changes you've made and why 📋
+            
+            If you haven't already, please take a look at our [Contributing Guidelines](../CONTRIBUTING.md).
+            
+            Thanks again for your contribution! 🙌
