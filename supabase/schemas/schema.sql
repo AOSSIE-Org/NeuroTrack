@@ -33,7 +33,7 @@ CREATE TABLE therapist (
     regulatory_body TEXT,
     start_availability_time TEXT,
     end_availability_time TEXT,
-    license_number TEXT,
+    license_number TEXT
 );
 
 -- Create the package table
@@ -120,7 +120,7 @@ CREATE TABLE observation_master (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     observation_text TEXT NOT NULL,
-    applicable_therapies UUID[] NOT NULL,
+    applicable_therapies UUID[] NOT NULL
 );
 
 -- Regressions Master Table
@@ -136,7 +136,7 @@ CREATE TABLE activity_master (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     activity_text TEXT NOT NULL,
-    applicable_therapies UUID[] NOT NULL,
+    applicable_therapies UUID[] NOT NULL
 );
 
 -- Daily Activities Table
@@ -150,15 +150,15 @@ CREATE TABLE daily_activities (
     patient_id UUID REFERENCES patient(id),
     start_time TIMESTAMPTZ,
     end_time TIMESTAMPTZ,
-    days_of_week INT2[],
+    days_of_week INT2[]
 );
 
 CREATE TABLE daily_activity_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     activity_id UUID REFERENCES daily_activities(id) ON DELETE CASCADE,
     date TIMESTAMPTZ NOT NULL,
-    activity_items JSONB NOT NULL
-    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE,
+    activity_items JSONB NOT NULL,
+    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE
 );
 
 -- Indexes on foreign keys for better performance
