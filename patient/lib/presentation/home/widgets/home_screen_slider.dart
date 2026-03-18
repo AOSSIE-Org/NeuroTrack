@@ -12,6 +12,9 @@ class LevelIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final safeMaxLevel = maxLevel <= 0 ? 1 : maxLevel;
+    final clampedLevel = currentLevel.clamp(0, safeMaxLevel.toDouble());
+
     return Card(
       elevation: 0,
       color: const Color(0xFFCB6CE6),
@@ -35,59 +38,78 @@ class LevelIndicator extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Stack(
-                    alignment: Alignment.centerLeft,
-                    children: [
-                      // Slider track
-                      Container(
-                        height: 40, // Increased height for better visibility
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFCB6CE6),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      // Tick marks
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(
-                          maxLevel, // Number of divisions based on max level
-                          (index) => Container(
-                            height: index % 2 == 0
-                                ? 20
-                                : 15, // Alternating heights for ticks
-                            width: 2,
-                            color: Colors.white.withOpacity(0.7),
-                          ),
-                        ),
-                      ),
-                      // Current level indicator (triangle)
-                      // Current level indicator (triangle with text above)
-                      Positioned(
-                        left: (currentLevel / (maxLevel)) *
-                            (MediaQuery.of(context).size.width * 0.8 -
-                                25), // Adjust for better alignment
-                        child: Column(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      const indicatorWidth = 40.0;
+                      const tickTop = 44.0;
+                      const halfIndicator = indicatorWidth / 2;
+                      final trackWidth = constraints.maxWidth;
+                      final ratio = clampedLevel / safeMaxLevel;
+                      final indicatorLeft = ratio * (trackWidth - indicatorWidth);
+
+                      return SizedBox(
+                        height: 84,
+                        child: Stack(
                           children: [
-                            Text(
-                              currentLevel.toStringAsFixed(0),
-                              style: const TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              top: tickTop,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: halfIndicator),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: List.generate(
+                                    safeMaxLevel + 1,
+                                    (index) => Container(
+                                      height: index % 2 == 0 ? 20 : 15,
+                                      width: 2,
+                                      color: Colors.white.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 5),
-                            CustomPaint(
-                              size: const Size(20, 20),
-                              painter: TrianglePainter(),
+                            Positioned(
+                              left: indicatorLeft,
+                              top: 0,
+                              child: SizedBox(
+                                width: indicatorWidth,
+                                height: tickTop + 20,
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      top: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Text(
+                                        clampedLevel.toStringAsFixed(0),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: tickTop,
+                                      left: 10,
+                                      child: CustomPaint(
+                                        size: const Size(20, 20),
+                                        painter: TrianglePainter(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(width: 10),
               ],
             ),
           ],
