@@ -10,6 +10,7 @@ import 'package:patient/presentation/reports/report_screen.dart'; // Import the 
 import 'package:patient/presentation/notification/updates_screen.dart';
 import 'package:patient/presentation/games/games_screen.dart';
 import 'package:patient/presentation/profile/profile_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../gen/assets.gen.dart';
 
@@ -28,6 +29,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   late List<Widget> _screens;
+  static const int _maxAutismLevel = 18;
+  double _autismLevel = 0;
 
   @override
   void initState() {
@@ -39,6 +42,31 @@ class _HomeScreenState extends State<HomeScreen> {
       UpdatesScreen(),
       const ProfileScreen(),
     ];
+    _fetchAutismLevel();
+  }
+
+  Future<void> _fetchAutismLevel() async {
+    try {
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) return;
+
+      final response = await Supabase.instance.client
+          .from('patient')
+          .select('autism_level')
+          .eq('id', currentUser.id)
+          .maybeSingle();
+
+      final rawLevel = response?['autism_level'];
+      final level = rawLevel is num ? rawLevel.toDouble() : 0;
+
+      if (!mounted) return;
+      setState(() {
+        _autismLevel = level.clamp(0, _maxAutismLevel.toDouble()).toDouble();
+        _screens[0] = _buildHomeContent();
+      });
+    } catch (_) {
+      // Keep fallback value when backend field is unavailable.
+    }
   }
 
   @override
@@ -138,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: ListView(
               children: [
-                const LevelIndicator(currentLevel: 5, maxLevel: 18),
+                LevelIndicator(currentLevel: _autismLevel, maxLevel: _maxAutismLevel),
                 const SizedBox(height: 15),
                 // Using the reusable TherapyGoalCard three times
                 GestureDetector(
@@ -153,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Therapy',
                     subtitle: 'Goals',
                     illustration: Assets.illustrations.i9nGoals,
-                    backgroundColor: Color(0xFFF9F3E3),
+                    backgroundColor: const Color(0xFFF9F3E3),
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -171,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Daily',
                     subtitle: 'Activities',
                     illustration: Assets.illustrations.i9nActivities,
-                    backgroundColor: Color(0xFFFEF4F0),
+                    backgroundColor: const Color(0xFFFEF4F0),
                     imageOnLeft: true,
                   ),
                 ),
@@ -182,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: 'Development',
                   subtitle: 'Milestones',
                   illustration: Assets.illustrations.i9nMilestones,
-                  backgroundColor: Color(0xFFF5FAF4),
+                  backgroundColor: const Color(0xFFF5FAF4),
                 ),
                 const SizedBox(height: 15),
                 // Games Card
