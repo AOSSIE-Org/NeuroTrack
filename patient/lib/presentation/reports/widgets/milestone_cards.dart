@@ -144,23 +144,26 @@ class HorizontalMilestoneCard extends StatelessWidget {
             ),
             child: _getIcon,
           ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                value,
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22, // Slightly smaller for horizontal layout
-                    ),
-              ),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
+          const SizedBox(width: 8),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  value,
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22, // Slightly smaller for horizontal layout
+                      ),
+                ),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),
