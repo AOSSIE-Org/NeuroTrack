@@ -6,7 +6,6 @@ import 'package:patient/presentation/auth/consultation_request_screen.dart';
 import 'package:patient/presentation/widgets/snackbar_service.dart';
 import 'package:patient/provider/assessment_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:patient/presentation/result/result.dart';
 
 
 class AssessmentScreen extends StatefulWidget {
