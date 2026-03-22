@@ -106,28 +106,30 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       endAvailabilityTime: selectedAvailabilityEndTime!,
                     );
 
+                    // Capture navigator and scaffold messenger before async gap
+                    final navigator = Navigator.of(context);
+                    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
                     // Save to Supabase
                     final success = await authProvider.storePersonalInfo(personalInfo);
 
+                    if (!mounted) return;
+
                     if (success) {
                       // Navigate to home screen
-                      if (mounted) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
-                          ),
-                        );
-                      }
+                      navigator.pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                      );
                     } else {
                       // Show error message
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(authProvider.errorMessage),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text(authProvider.errorMessage),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
                   }
                 },

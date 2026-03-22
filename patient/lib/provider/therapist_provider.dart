@@ -34,6 +34,9 @@ class TherapistProvider with ChangeNotifier {
 
   // Book Appointment with Therapist
   Future<void> bookAppointment(BuildContext context, Map<String, dynamic> therapist, String patientId) async {
+    // Capture ScaffoldMessengerState before any async gap
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     bool confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -62,11 +65,11 @@ class TherapistProvider with ChangeNotifier {
         "status": "pending"
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         const SnackBar(content: Text("Appointment booked successfully!"))
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(content: Text("Error booking appointment: $e"))
       );
     } finally {
