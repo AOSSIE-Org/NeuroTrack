@@ -38,7 +38,7 @@ class _TherapistDetailsScreenState extends State<TherapistDetailsScreen> {
   };
 
   // Function to pick a date
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate() async {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -46,18 +46,21 @@ class _TherapistDetailsScreenState extends State<TherapistDetailsScreen> {
       lastDate: DateTime.now().add(const Duration(days: 30)), // Allow booking for 30 days
     );
 
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-        selectedTimeSlot = null; // Reset time slot when date changes
-      });
+    if (picked == null || picked == selectedDate) return;
+    if (!mounted) return;
 
-      _selectTimeSlot(context);
+    setState(() {
+      selectedDate = picked;
+      selectedTimeSlot = null; // Reset time slot when date changes
+    });
+
+    if (mounted) {
+      _selectTimeSlot();
     }
   }
 
   // Function to select a 30-minute time slot
-  void _selectTimeSlot(BuildContext context) {
+  void _selectTimeSlot() {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext ctx) {
@@ -136,7 +139,7 @@ class _TherapistDetailsScreenState extends State<TherapistDetailsScreen> {
 
               // Select Date & Time Button
               ElevatedButton.icon(
-                onPressed: () => _selectDate(context),
+                onPressed: _selectDate,
                 icon: const Icon(Icons.calendar_today),
                 label: const Text("Select Date & Time"),
                 style: ElevatedButton.styleFrom(
