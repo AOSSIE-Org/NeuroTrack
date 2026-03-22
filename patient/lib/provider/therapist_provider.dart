@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:patient/presentation/assessments/models/assessment_card_model.dart';
-import 'package:patient/repository/supabase_assessments_repository.dart';
-
-import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TherapistProvider with ChangeNotifier {

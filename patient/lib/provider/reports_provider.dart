@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:patient/core/core.dart';
 
-import '../gen/assets.gen.dart';
-
 enum MilestoneCardType {
   completed,
   missed,
