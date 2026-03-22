@@ -372,49 +372,6 @@ class _ConsultationRequestDetailScreenState
     );
   }
 
-  Widget _buildNotesSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('Patient Note'),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.withOpacity(0.2)),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.format_quote,
-                  color: const Color(0xFF6A1B9A).withOpacity(0.7),
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                // Expanded(
-                //   child: Text(
-                //     widget.request.notes!,
-                //     style: const TextStyle(
-                //       fontSize: 15,
-                //       height: 1.5,
-                //       fontStyle: FontStyle.italic,
-                //     ),
-                //   ),
-                // ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildActionButtons() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -477,42 +434,6 @@ class _ConsultationRequestDetailScreenState
         fontWeight: FontWeight.bold,
         color: Color(0xFF6A1B9A),
       ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value, IconData icon) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          icon,
-          size: 20,
-          color: const Color(0xFF6A1B9A).withOpacity(0.7),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 

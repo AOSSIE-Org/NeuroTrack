@@ -232,7 +232,6 @@ class _AddTherapyDetailsScreenState extends State<AddTherapyDetailsScreen> {
 
 class _BuildOptionTile extends StatelessWidget {
   const _BuildOptionTile({
-    super.key,
     required this.name,
     required this.isSelected,
     required this.onChanged,

@@ -45,7 +45,6 @@ class _AuthScreenState extends State<AuthScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     await authProvider.checkAuthentication();
-    final isNewUser = await authProvider.checkIfUserIsNew();
 
     final fullName = session.user.userMetadata?['full_name'];
     final email = session.user.email ?? 'Unknown User';
