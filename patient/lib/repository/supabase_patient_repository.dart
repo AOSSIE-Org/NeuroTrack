@@ -123,7 +123,21 @@ class SupabasePatientRepository implements PatientRepository {
   @override
   Future<ActionResult> deleteAppointment(String id) async {
     try {
-      await _supabaseClient.from('session').delete().eq('id', id);
+      final currentUser = _supabaseClient.auth.currentUser;
+      if (currentUser == null) {
+        return ActionResultFailure(
+          errorMessage: 'User is not authenticated',
+          statusCode: 401
+        );
+      }
+
+      // Add ownership check - only allow deletion of user's own sessions
+      await _supabaseClient
+          .from('session')
+          .delete()
+          .eq('id', id)
+          .eq('patient_id', currentUser.id);
+
       return ActionResultSuccess(
         data: 'Appointment deleted successfully',
         statusCode: 200
