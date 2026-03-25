@@ -7,6 +7,7 @@ class TaskProvider extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
   final PatientRepository _patientRepository;
   ApiStatus _apiStatus = ApiStatus.initial;
+  ApiStatus _syncStatus = ApiStatus.initial;
   String? _activityId;
   String? _activitySetId;
 
@@ -76,6 +77,26 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates activity completion status in the background (typically before navigation)
+  /// This method syncs the current task completion status to the backend
+  Future<void> updateActivityInBackground() async {
+    if (_allTasks.isEmpty) {
+      return;
+    }
+    try {
+      _syncStatus = ApiStatus.loading;
+      notifyListeners();
+      await updateActivityCompletion(_allTasks);
+      _syncStatus = ApiStatus.success;
+    } catch(e) {
+      _syncStatus = ApiStatus.failure;
+      // Activity data is still available locally - user can retry on return
+    } finally {
+      notifyListeners();
+    }
+  }
+
   int get completedTasksCount => tasks.where((task) => task.isCompleted ?? false).length;
   int get totalTasksCount => tasks.length;
+  ApiStatus get syncStatus => _syncStatus;
 }

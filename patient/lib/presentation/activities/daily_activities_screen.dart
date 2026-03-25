@@ -62,7 +62,7 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () {
-           // context.read<TaskProvider>().updateActivityInBackground(); // TODO: Uncomment this when the backend is ready
+            context.read<TaskProvider>().updateActivityInBackground();
             Navigator.pop(context);
           },
         ),
