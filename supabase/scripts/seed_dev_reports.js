@@ -188,6 +188,11 @@ async function seedReportsForPatient(patientId) {
       supabase.from('therapy_goal').select('id', { count: 'exact', head: true }).eq('patient_id', user.id),
     ]);
 
+    // Validate count query results to ensure errors surface during verification
+    if (activities.error) throw new Error(`count daily_activities failed: ${activities.error.message}`);
+    if (logs.error) throw new Error(`count daily_activity_logs failed: ${logs.error.message}`);
+    if (goals.error) throw new Error(`count therapy_goal failed: ${goals.error.message}`);
+
     console.log(JSON.stringify({
       email: DEV_EMAIL,
       userId: user.id,
