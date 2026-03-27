@@ -1,0 +1,175 @@
+-- NeuroTrack Database Schema (fixed ordering & syntax)
+-- Run this in Supabase SQL Editor: https://supabase.com/dashboard/project/apqhleefisqnavwxuvqg/sql/new
+
+-- Create therapist table first (referenced by patient)
+CREATE TABLE IF NOT EXISTS therapist (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    phone TEXT NOT NULL,
+    clinic_id UUID,
+    license TEXT,
+    approved BOOLEAN DEFAULT FALSE,
+    specialisation TEXT,
+    gender TEXT,
+    offered_therapies TEXT[],
+    age INT2,
+    regulatory_body TEXT,
+    start_availability_time TEXT,
+    end_availability_time TEXT,
+    license_number TEXT
+);
+
+-- Create the patient table
+CREATE TABLE IF NOT EXISTS patient (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    patient_name TEXT NOT NULL,
+    age INT2,
+    is_adult BOOLEAN NOT NULL,
+    guardian_name TEXT,
+    phone TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    guardian_relation TEXT,
+    autism_level INT2,
+    onboarded_on TIMESTAMPTZ,
+    therapist_id UUID REFERENCES therapist(id) ON DELETE SET NULL,
+    gender TEXT,
+    country TEXT
+);
+
+-- Create the package table
+CREATE TABLE IF NOT EXISTS package (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    name TEXT NOT NULL,
+    duration INT4 NOT NULL
+);
+
+-- Create the session table
+-- TODO: Enable Row-Level Security (RLS) in follow-up PR for defense-in-depth
+-- Will add: ALTER TABLE session ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY patient_owns_session ON session FOR DELETE USING (patient_id = auth.uid());
+CREATE TABLE IF NOT EXISTS session (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    timestamp TIMESTAMPTZ NOT NULL,
+    therapist_id UUID REFERENCES therapist(id),
+    patient_id UUID REFERENCES patient(id),
+    is_consultation BOOLEAN DEFAULT FALSE,
+    mode INT2,
+    duration INT4,
+    name TEXT,
+    status TEXT NOT NULL CHECK (status IN ('accepted', 'declined', 'pending')) DEFAULT 'pending',
+    declined_reason TEXT
+);
+
+-- Therapy Table
+CREATE TABLE IF NOT EXISTS therapy (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    name TEXT NOT NULL UNIQUE,
+    description TEXT
+);
+
+-- Create the therapy_goal table
+CREATE TABLE IF NOT EXISTS therapy_goal (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    performed_on TIMESTAMPTZ,
+    therapist_id UUID REFERENCES therapist(id),
+    therapy_mode INT2,
+    duration INT4,
+    therapy_type INT2,
+    therapy_type_id UUID REFERENCES therapy(id),
+    goals JSONB,
+    observations JSONB,
+    regressions JSONB,
+    activities JSONB,
+    patient_id UUID REFERENCES patient(id)
+);
+
+-- Create the assessments table
+CREATE TABLE IF NOT EXISTS assessments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    name TEXT NOT NULL,
+    description TEXT,
+    category TEXT,
+    cutoff_score INT2,
+    image_url TEXT,
+    questions JSONB NOT NULL
+);
+
+-- Create the assessment_results table
+CREATE TABLE IF NOT EXISTS assessment_results (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    assessment_id UUID REFERENCES assessments(id),
+    patient_id UUID REFERENCES patient(id),
+    submission JSONB,
+    result JSONB
+);
+
+-- Therapy Goals Master Table
+CREATE TABLE IF NOT EXISTS goal_master (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    goal_text TEXT NOT NULL,
+    applicable_therapies UUID[] NOT NULL
+);
+
+-- Observations Master Table
+CREATE TABLE IF NOT EXISTS observation_master (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    observation_text TEXT NOT NULL,
+    applicable_therapies UUID[] NOT NULL
+);
+
+-- Regressions Master Table
+CREATE TABLE IF NOT EXISTS regression_master (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    regression_text TEXT NOT NULL,
+    applicable_therapies UUID[] NOT NULL
+);
+
+-- Activities Master Table
+CREATE TABLE IF NOT EXISTS activity_master (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    activity_text TEXT NOT NULL,
+    applicable_therapies UUID[] NOT NULL
+);
+
+-- Daily Activities Table
+CREATE TABLE IF NOT EXISTS daily_activities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    activity_name TEXT NOT NULL,
+    activity_list JSONB,
+    is_active BOOLEAN DEFAULT TRUE,
+    therapist_id UUID REFERENCES therapist(id) ON DELETE SET NULL,
+    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE,
+    start_time TIMESTAMPTZ,
+    end_time TIMESTAMPTZ,
+    days_of_week INT2[]
+);
+
+-- Daily Activity Logs Table
+CREATE TABLE IF NOT EXISTS daily_activity_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    activity_id UUID REFERENCES daily_activities(id) ON DELETE CASCADE,
+    date TIMESTAMPTZ NOT NULL,
+    activity_items JSONB NOT NULL,
+    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE
+);
+
+-- Indexes on foreign keys for better performance
+CREATE INDEX IF NOT EXISTS idx_patient_therapist_id ON patient(therapist_id);
+CREATE INDEX IF NOT EXISTS idx_session_therapist_id ON session(therapist_id);
+CREATE INDEX IF NOT EXISTS idx_session_patient_id ON session(patient_id);
+CREATE INDEX IF NOT EXISTS idx_therapy_goal_therapist_id ON therapy_goal(therapist_id);
+CREATE INDEX IF NOT EXISTS idx_therapy_goal_patient_id ON therapy_goal(patient_id);

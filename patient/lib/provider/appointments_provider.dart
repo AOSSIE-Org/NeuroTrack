@@ -135,7 +135,7 @@ class AppointmentsProvider extends ChangeNotifier {
         availableTimeSlots = [];
       }
     } catch(e) {
-      print(e);
+      debugPrint("Error fetching time slots: $e");
       if (token == _fetchToken) {
         availableTimeSlots = [];
       }
@@ -166,7 +166,7 @@ class AppointmentsProvider extends ChangeNotifier {
         }
       }
     } catch(e) {
-      print(e);
+      debugPrint("Error fetching appointments: $e");
     } finally {
       notifyListeners();
     }
@@ -193,7 +193,7 @@ class AppointmentsProvider extends ChangeNotifier {
         return false;
       }
     } catch(e) {
-      print(e);
+      debugPrint("Error fetching appointments: $e");
       return false;
     } finally {
       fetchAllAppointments();
@@ -211,7 +211,7 @@ class AppointmentsProvider extends ChangeNotifier {
         return false;
       }
     } catch(e) {
-      print(e);
+      debugPrint("Error fetching appointments: $e");
       return false;
     } finally {
       fetchAllAppointments();
