@@ -3,16 +3,39 @@ const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
 
 // Validate required environment variables
-const { SUPABASE_URL, SUPABASE_KEY } = process.env;
+const { SUPABASE_URL, SUPABASE_KEY, ALLOW_DEV_SEED, DEV_EMAIL, DEV_PASSWORD } = process.env;
+
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('Missing required environment variables: SUPABASE_URL and SUPABASE_KEY');
   console.error('Please check your .env file and ensure these variables are set.');
   process.exit(1);
 }
 
-// Dev credentials - can be overridden via environment for security
-const DEV_EMAIL = process.env.DEV_EMAIL || 'testdev@neurotrack.dev';
-const DEV_PASSWORD = process.env.DEV_PASSWORD || 'TestDev123!';
+// Safety gate to prevent running in production
+if (ALLOW_DEV_SEED !== 'true') {
+  console.error('🚨 Safety Gate: Refusing to run seed script.');
+  console.error('This script modifies the database and should only run in development.');
+  console.error('Set ALLOW_DEV_SEED=true in your environment to proceed.');
+  process.exit(1);
+}
+
+// Validate dev credentials are provided (no defaults for security)
+if (!DEV_EMAIL || !DEV_PASSWORD) {
+  console.error('🚨 Security Check: DEV_EMAIL and DEV_PASSWORD must be explicitly set.');
+  console.error('This prevents accidentally using predictable default credentials.');
+  console.error('Please set DEV_EMAIL and DEV_PASSWORD in your environment variables.');
+  process.exit(1);
+}
+
+// Additional safety: warn if URL looks like production
+if (SUPABASE_URL.includes('prod') || SUPABASE_URL.includes('live') || SUPABASE_URL.includes('main')) {
+  console.error('🚨 Production URL Detected: SUPABASE_URL appears to be a production endpoint.');
+  console.error('Refusing to run seed script against production database.');
+  console.error('URL:', SUPABASE_URL);
+  process.exit(1);
+}
+
+console.log('✅ Safety checks passed. Proceeding with development seeding...');
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -21,11 +44,29 @@ function isoAtLocalMidday(date) {
   return d.toISOString();
 }
 
-async function getOrCreateDevUser() {
-  const { data, error } = await supabase.auth.admin.listUsers();
-  if (error) throw new Error(`listUsers failed: ${error.message}`);
+// Paginated user lookup to handle projects with >50 users
+async function findUserByEmail(email) {
+  let page = 1;
+  const perPage = 200; // Use higher page size for efficiency
 
-  const existing = data.users.find((u) => u.email === DEV_EMAIL);
+  while (true) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
+    if (error) throw new Error(`listUsers failed: ${error.message}`);
+
+    const foundUser = data.users.find((u) => u.email === email);
+    if (foundUser) return foundUser;
+
+    // If we get fewer users than perPage, we've reached the end
+    if (!data.users.length || data.users.length < perPage) {
+      return null;
+    }
+
+    page += 1;
+  }
+}
+
+async function getOrCreateDevUser() {
+  const existing = await findUserByEmail(DEV_EMAIL);
   if (existing) return existing;
 
   const { data: created, error: createError } = await supabase.auth.admin.createUser({
