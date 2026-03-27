@@ -3,10 +3,10 @@
 
 -- Create therapist table first (referenced by patient)
 CREATE TABLE IF NOT EXISTS therapist (
-    id UUID PRIMARY KEY REFERENCES auth.users(id),
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     name TEXT NOT NULL,
-    email TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
     phone TEXT NOT NULL,
     clinic_id UUID,
     license TEXT,
@@ -23,18 +23,18 @@ CREATE TABLE IF NOT EXISTS therapist (
 
 -- Create the patient table
 CREATE TABLE IF NOT EXISTS patient (
-    id UUID PRIMARY KEY REFERENCES auth.users(id),
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     patient_name TEXT NOT NULL,
     age INT2,
     is_adult BOOLEAN NOT NULL,
     guardian_name TEXT,
     phone TEXT NOT NULL,
-    email TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
     guardian_relation TEXT,
     autism_level INT2,
     onboarded_on TIMESTAMPTZ,
-    therapist_id UUID REFERENCES therapist(id),
+    therapist_id UUID REFERENCES therapist(id) ON DELETE SET NULL,
     gender TEXT,
     country TEXT
 );
@@ -48,6 +48,9 @@ CREATE TABLE IF NOT EXISTS package (
 );
 
 -- Create the session table
+-- TODO: Enable Row-Level Security (RLS) in follow-up PR for defense-in-depth
+-- Will add: ALTER TABLE session ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY patient_owns_session ON session FOR DELETE USING (patient_id = auth.uid());
 CREATE TABLE IF NOT EXISTS session (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -104,7 +107,7 @@ CREATE TABLE IF NOT EXISTS assessment_results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     assessment_id UUID REFERENCES assessments(id),
-    patient_id UUID REFERENCES auth.users(id),
+    patient_id UUID REFERENCES patient(id),
     submission JSONB,
     result JSONB
 );
@@ -148,8 +151,8 @@ CREATE TABLE IF NOT EXISTS daily_activities (
     activity_name TEXT NOT NULL,
     activity_list JSONB,
     is_active BOOLEAN DEFAULT TRUE,
-    therapist_id UUID REFERENCES therapist(id),
-    patient_id UUID REFERENCES patient(id),
+    therapist_id UUID REFERENCES therapist(id) ON DELETE SET NULL,
+    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE,
     start_time TIMESTAMPTZ,
     end_time TIMESTAMPTZ,
     days_of_week INT2[]

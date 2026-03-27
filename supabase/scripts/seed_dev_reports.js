@@ -2,10 +2,19 @@ require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
 
-const DEV_EMAIL = 'testdev@neurotrack.dev';
-const DEV_PASSWORD = 'TestDev123!';
+// Validate required environment variables
+const { SUPABASE_URL, SUPABASE_KEY } = process.env;
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.error('Missing required environment variables: SUPABASE_URL and SUPABASE_KEY');
+  console.error('Please check your .env file and ensure these variables are set.');
+  process.exit(1);
+}
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+// Dev credentials - can be overridden via environment for security
+const DEV_EMAIL = process.env.DEV_EMAIL || 'testdev@neurotrack.dev';
+const DEV_PASSWORD = process.env.DEV_PASSWORD || 'TestDev123!';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function isoAtLocalMidday(date) {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
@@ -47,9 +56,14 @@ async function upsertPatient(user) {
 
 async function seedReportsForPatient(patientId) {
   // Reset only report-related demo rows for deterministic local tests.
-  await supabase.from('daily_activity_logs').delete().eq('patient_id', patientId);
-  await supabase.from('daily_activities').delete().eq('patient_id', patientId);
-  await supabase.from('therapy_goal').delete().eq('patient_id', patientId);
+  const { error: delLogsErr } = await supabase.from('daily_activity_logs').delete().eq('patient_id', patientId);
+  if (delLogsErr) throw new Error(`delete daily_activity_logs failed: ${delLogsErr.message}`);
+
+  const { error: delActErr } = await supabase.from('daily_activities').delete().eq('patient_id', patientId);
+  if (delActErr) throw new Error(`delete daily_activities failed: ${delActErr.message}`);
+
+  const { error: delGoalErr } = await supabase.from('therapy_goal').delete().eq('patient_id', patientId);
+  if (delGoalErr) throw new Error(`delete therapy_goal failed: ${delGoalErr.message}`);
 
   const activityRows = [
     {
@@ -147,12 +161,17 @@ async function seedReportsForPatient(patientId) {
     id: uuidv4(),
     patient_id: patientId,
     performed_on: isoAtLocalMidday(today),
-    goals: ['Improve eye contact duration', 'Respond to name within 2 tries'],
-    observations: 'Patient showed progress in structured settings',
+    goals: [
+      { id: uuidv4(), name: 'Improve eye contact duration' },
+      { id: uuidv4(), name: 'Respond to name within 2 tries' }
+    ],
+    observations: [
+      { id: uuidv4(), name: 'Patient showed progress in structured settings' }
+    ],
     regressions: [
       { id: uuidv4(), name: 'Distraction in noisy environments' },
     ],
-    activities: activityRows.map(a => a.activity_name),
+    activities: activityRows.map(a => ({ id: uuidv4(), name: a.activity_name })),
   });
   if (goalError) throw new Error(`insert therapy_goal (today) failed: ${goalError.message}`);
 }
