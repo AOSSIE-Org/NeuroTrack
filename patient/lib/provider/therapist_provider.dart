@@ -27,7 +27,8 @@ class TherapistProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _isLoading = false;
-      print("Error fetching therapists: $e");
+      // TODO: Implement proper error logging and user notification
+      debugPrint("Error fetching therapists: $e");
       notifyListeners();
     }
   }
