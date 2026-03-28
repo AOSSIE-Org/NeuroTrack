@@ -83,17 +83,12 @@ class TaskProvider extends ChangeNotifier {
     if (_allTasks.isEmpty) {
       return;
     }
-    try {
-      _syncStatus = ApiStatus.loading;
-      notifyListeners();
-      await updateActivityCompletion(_allTasks);
-      _syncStatus = ApiStatus.success;
-    } catch(e) {
-      _syncStatus = ApiStatus.failure;
-      // Activity data is still available locally - user can retry on return
-    } finally {
-      notifyListeners();
-    }
+    _syncStatus = ApiStatus.loading;
+    notifyListeners();
+    await updateActivityCompletion(_allTasks);
+    // updateActivityCompletion sets _apiStatus, copy it to _syncStatus
+    _syncStatus = _apiStatus;
+    notifyListeners();
   }
 
   int get completedTasksCount => tasks.where((task) => task.isCompleted ?? false).length;
