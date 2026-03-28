@@ -36,8 +36,11 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ConsultationProvider>(context, listen: false)
           .fetchConsultationRequests();
-      Provider.of<TherapistDataProvider>(context, listen: false)
-          .fetchPatientsMappedToTherapist();
+      final therapistProvider = Provider.of<TherapistDataProvider>(context, listen: false);
+      therapistProvider.fetchPatientsMappedToTherapist();
+      therapistProvider.fetchTotals();
+      Provider.of<SessionProvider>(context, listen: false)
+          .fetchTherapistSessions();
     });
 
     _refreshTimer = Timer.periodic(const Duration(minutes: 3), (_) {
@@ -249,34 +252,54 @@ class HomeContent extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            //_buildConsultationRequestSection(context),
-          //  _buildConsultationRequestSection(context),
-           Consumer<TherapistDataProvider>(
-            builder: (context, provider, _) {
-              if(provider.patientsStatus == ApiStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if(provider.patientsStatus == ApiStatus.failure) {
-                return const Center(child: Text('No patients found'));
-              } else if(provider.patientsStatus == ApiStatus.success) {
-                if(provider.patients.isEmpty) { 
-                  return const Center(child: Text('No patients found'));
-                } else {
-                  return Column(
-                    children: provider.patients.map((patient) => PatientCard(
-                    name: patient.patientName,
-                    id: patient.patientId,
-                    phone: patient.phoneNo,
-                    email: patient.email,
-                    package: '-',
-                    duration: '-',
-                    imagePath: 'assets/abdul.png',
-                  )).toList(),
-                  );
+            Consumer2<TherapistDataProvider, SessionProvider>(
+              builder: (context, therapistProvider, sessionProvider, _) {
+                if (therapistProvider.isLoading || sessionProvider.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
                 }
-              }
-              return const SizedBox.shrink();
-            },
-           ),
+
+                return Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      StatsCard(
+                        imagePath: 'assets/icon1.png',
+                        backgroundColor: const Color(0xFFFEE8E8),
+                        label: 'Patients',
+                        value: therapistProvider.totalPatients.toString(),
+                      ),
+                      StatsCard(
+                        imagePath: 'assets/icon2.png',
+                        backgroundColor: const Color(0xFFF1E8FE),
+                        label: 'Sessions',
+                        value: sessionProvider.totalSessions.toString(),
+                      ),
+                      StatsCard(
+                        imagePath: 'assets/icon3.png',
+                        backgroundColor: const Color(0xFFE8FEF0),
+                        label: 'Therapies',
+                        value: therapistProvider.totalTherapies.toString(),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+            // _buildConsultationRequestSection(context),
+
           ],
         ),
       ),
