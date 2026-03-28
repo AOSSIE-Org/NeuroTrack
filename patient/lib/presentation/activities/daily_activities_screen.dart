@@ -55,18 +55,25 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daily Activities'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () {
-           // context.read<TaskProvider>().updateActivityInBackground(); // TODO: Uncomment this when the backend is ready
-            Navigator.pop(context);
-          },
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          context.read<TaskProvider>().updateActivityInBackground();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Daily Activities'),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: () {
+              context.read<TaskProvider>().updateActivityInBackground();
+              Navigator.pop(context);
+            },
+          ),
         ),
-      ),
       body: Consumer<TaskProvider>(
         builder: (context, taskProvider, child) {
           final tasks = taskProvider.tasks;
@@ -228,6 +235,7 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
             ],
           );
         },
+      ),
       ),
     );
   }

@@ -152,6 +152,15 @@ class TherapistDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  int _totalPatients = 0;
+  int get totalPatients => _totalPatients;
+
+  int _totalSessions = 0;
+  int get totalSessions => _totalSessions;
+
+  int _totalTherapies = 0;
+  int get totalTherapies => _totalTherapies;
+
   // Fetch therapies based on selected profession
   Future<void> fetchTherapies(int professionId) async {
     _isLoading = true;
@@ -164,6 +173,29 @@ class TherapistDataProvider extends ChangeNotifier {
       _errorMessage = '';
     } else if (result is ActionResultFailure) {
       _errorMessage = result.errorMessage!;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> fetchTotals() async {
+    _isLoading = true;
+    notifyListeners();
+
+    final patientsResult = await _therapistRepository.getTotalPatients();
+    if (patientsResult is ActionResultSuccess) {
+      _totalPatients = patientsResult.data as int;
+    }
+
+    final sessionsResult = await _therapistRepository.getTotalSessions();
+    if (sessionsResult is ActionResultSuccess) {
+      _totalSessions = sessionsResult.data as int;
+    }
+
+    final therapiesResult = await _therapistRepository.getTotalTherapies();
+    if (therapiesResult is ActionResultSuccess) {
+      _totalTherapies = therapiesResult.data as int;
     }
 
     _isLoading = false;

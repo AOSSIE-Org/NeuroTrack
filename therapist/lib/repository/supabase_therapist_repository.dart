@@ -129,21 +129,50 @@ class SupabaseTherapistRepository implements TherapistRepository {
   }
 
   @override
-  Future<ActionResult> getTotalPatients() {
-    // TODO: implement getTotalPatients
-    throw UnimplementedError();
+  Future<ActionResult> getTotalPatients() async {
+    try {
+      final response = await _supabaseClient
+          .from('patient')
+          .select('id')
+          .eq('therapist_id', _supabaseClient.auth.currentUser!.id);
+
+      final count = response is List ? response.length : 0;
+      return ActionResultSuccess(data: count, statusCode: 200);
+    } catch (e) {
+      return ActionResultFailure(errorMessage: e.toString(), statusCode: 400);
+    }
   }
-  
+
   @override
-  Future<ActionResult> getTotalSessions() {
-    // TODO: implement getTotalSessions
-    throw UnimplementedError();
+  Future<ActionResult> getTotalSessions() async {
+    try {
+      final response = await _supabaseClient
+          .from('session')
+          .select('id')
+          .eq('therapist_id', _supabaseClient.auth.currentUser!.id);
+
+      final count = response is List ? response.length : 0;
+      return ActionResultSuccess(data: count, statusCode: 200);
+    } catch (e) {
+      return ActionResultFailure(errorMessage: e.toString(), statusCode: 400);
+    }
   }
-  
+
   @override
-  Future<ActionResult> getTotalTherapies() {
-    // TODO: implement getTotalTherapies
-    throw UnimplementedError();
+  Future<ActionResult> getTotalTherapies() async {
+    try {
+      final response = await _supabaseClient
+          .from('therapy_goal')
+          .select('therapy_type_id')
+          .eq('therapist_id', _supabaseClient.auth.currentUser!.id);
+
+      final count = response is List
+          ? (response.map((e) => e['therapy_type_id']).toSet().length)
+          : 0;
+      return ActionResultSuccess(data: count, statusCode: 200);
+    } catch (e) {
+      return ActionResultFailure(errorMessage: e.toString(), statusCode: 400);
+    }
   }
 
   @override
