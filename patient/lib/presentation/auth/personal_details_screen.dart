@@ -113,15 +113,11 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
 
             if (_formKey.currentState?.validate() ?? false) {
               if (isAssessmentForChild && selectedRelation.isEmpty) {
-                setState(() {
-                  _validationErrors['relation'] = 'Please select your relation with the patient';
-                });
+                SnackbarService.showError('Please select your relation with the patient');
                 return;
               }
               if (isAssessmentForChild && (selectedChildGender == null || selectedChildGender!.isEmpty)) {
-                setState(() {
-                  _validationErrors['gender'] = 'Please select patient gender';
-                });
+                SnackbarService.showError('Please select patient gender');
                 return;
               }
               final personalInfoModel = getPersonalInfo;
