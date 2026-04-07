@@ -91,11 +91,13 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
           : adultNameController.text,
       age: isAssessmentForChild ? parseAge(childAgeController.text) : parseAge(adultAgeController.text),
       isAdult: isAssessmentForChild ? isAdult(childAgeController.text) : isAdult(adultAgeController.text),
-      phoneNo: phoneController.text,
+      phoneNo: isAssessmentForChild ? guardianPhoneController.text : phoneController.text,
       email: '',
       guardianName: isAssessmentForChild ? adultNameController.text : '',
-      guardianRelation: isAssessmentForChild ? guardianPhoneController.text : phoneController.text,
-      country: selectedCountry?.displayName ?? '',
+      guardianRelation: isAssessmentForChild ? selectedRelation : '',
+      country: isAssessmentForChild
+          ? selectedChildCountry?.displayName ?? ''
+          : selectedCountry?.displayName ?? '',
       gender: isAssessmentForChild ? selectedChildGender ?? '' : selectedGender ?? '',
     );
   }
@@ -110,6 +112,18 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
           onPressed: () {
 
             if (_formKey.currentState?.validate() ?? false) {
+              if (isAssessmentForChild && selectedRelation.isEmpty) {
+                setState(() {
+                  _validationErrors['relation'] = 'Please select your relation with the patient';
+                });
+                return;
+              }
+              if (isAssessmentForChild && (selectedChildGender == null || selectedChildGender!.isEmpty)) {
+                setState(() {
+                  _validationErrors['gender'] = 'Please select patient gender';
+                });
+                return;
+              }
               final personalInfoModel = getPersonalInfo;
               final authProvider = context.read<AuthProvider>();
               authProvider.storePatientPersonalInfo(personalInfoModel);
