@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:patient/core/core.dart';
 import 'package:patient/model/task_model.dart';
@@ -9,6 +11,7 @@ class TaskProvider extends ChangeNotifier {
   ApiStatus _apiStatus = ApiStatus.initial;
   String? _activityId;
   String? _activitySetId;
+  Timer? _debounceTimer;
 
   TaskProvider({
     required PatientRepository patientRepository,
@@ -56,11 +59,11 @@ class TaskProvider extends ChangeNotifier {
 
   DateTime get selectedDate => _selectedDate;
 
-  void setSelectedDate(DateTime date) {
+  void setSelectedDate(DateTime date) async {
     _selectedDate = date;
     notifyListeners();
-    if(_allTasks.isNotEmpty) {
-      updateActivityCompletion(_allTasks);
+    if (_allTasks.isNotEmpty) {
+      await updateActivityCompletion(_allTasks);
     }
     getTodayActivities(date: date);
   }
@@ -69,11 +72,30 @@ class TaskProvider extends ChangeNotifier {
     return _allTasks;
   }
 
-  void toggleTaskCompletion(String activityId, bool isCompleted) async {
+  void toggleTaskCompletion(String activityId, bool isCompleted) {
     _allTasks = _allTasks.map(
       (task) => task.activityId == activityId ? task.copyWith(isCompleted: isCompleted) : task)
       .toList();
     notifyListeners();
+
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 1500), () {
+      updateActivityCompletion(_allTasks);
+    });
+  }
+
+  Future<void> saveAndFlush() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+    if (_allTasks.isNotEmpty) {
+      await updateActivityCompletion(_allTasks);
+    }
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 
   int get completedTasksCount => tasks.where((task) => task.isCompleted ?? false).length;
