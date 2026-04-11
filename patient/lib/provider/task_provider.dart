@@ -12,6 +12,7 @@ class TaskProvider extends ChangeNotifier {
   String? _activityId;
   String? _activitySetId;
   Timer? _debounceTimer;
+  bool _isDisposed = false;
 
   TaskProvider({
     required PatientRepository patientRepository,
@@ -44,7 +45,7 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> updateActivityCompletion(List<PatientTaskModel> tasks) async {
     try {
-      final result = await _patientRepository.updateActivityCompletion(tasks: _allTasks, activityId: _activityId, activitySetId: _activitySetId);
+      final result = await _patientRepository.updateActivityCompletion(tasks: tasks, activityId: _activityId, activitySetId: _activitySetId);
       if(result is ActionResultSuccess) {
         _apiStatus = ApiStatus.success;
       } else {
@@ -53,7 +54,7 @@ class TaskProvider extends ChangeNotifier {
     } catch(e) {
       _apiStatus = ApiStatus.failure;
     } finally {
-      notifyListeners();
+      if (!_isDisposed) notifyListeners();
     }
   }
 
@@ -67,7 +68,7 @@ class TaskProvider extends ChangeNotifier {
     if (_allTasks.isNotEmpty) {
       await updateActivityCompletion(_allTasks);
     }
-    getTodayActivities(date: date);
+    await getTodayActivities(date: date);
   }
 
   List<PatientTaskModel> get tasks {
@@ -97,10 +98,8 @@ class TaskProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    if (_debounceTimer?.isActive ?? false) {
-      _debounceTimer?.cancel();
-      unawaited(updateActivityCompletion(_allTasks));
-    }
+    _isDisposed = true;
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
