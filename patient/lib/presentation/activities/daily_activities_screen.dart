@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +15,7 @@ class DailyActivitiesScreen extends StatefulWidget {
 }
 
 class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late DateTime today;
   late AnimationController _progressController;
   late Animation<double> _progressAnimation;
@@ -22,6 +24,7 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       context.read<TaskProvider>().getTodayActivities();
     });
@@ -34,8 +37,16 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _progressController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      unawaited(context.read<TaskProvider>().saveAndFlush());
+    }
   }
 
   void _animateProgress(double end) {
@@ -55,15 +66,22 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await context.read<TaskProvider>().saveAndFlush();
+        if (context.mounted) Navigator.of(context).pop();
+      },
+      child: Scaffold(
       appBar: AppBar(
         title: const Text('Daily Activities'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () {
-           // context.read<TaskProvider>().updateActivityInBackground(); // TODO: Uncomment this when the backend is ready
-            Navigator.pop(context);
+          onPressed: () async {
+            await context.read<TaskProvider>().saveAndFlush();
+            if (context.mounted) Navigator.of(context).pop();
           },
         ),
       ),
@@ -229,6 +247,7 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
           );
         },
       ),
+    ),
     );
   }
 }

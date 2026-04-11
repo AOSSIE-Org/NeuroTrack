@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:patient/core/core.dart';
 import 'package:patient/model/task_model.dart';
@@ -9,6 +11,8 @@ class TaskProvider extends ChangeNotifier {
   ApiStatus _apiStatus = ApiStatus.initial;
   String? _activityId;
   String? _activitySetId;
+  Timer? _debounceTimer;
+  bool _isDisposed = false;
 
   TaskProvider({
     required PatientRepository patientRepository,
@@ -41,7 +45,7 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> updateActivityCompletion(List<PatientTaskModel> tasks) async {
     try {
-      final result = await _patientRepository.updateActivityCompletion(tasks: _allTasks, activityId: _activityId, activitySetId: _activitySetId);
+      final result = await _patientRepository.updateActivityCompletion(tasks: tasks, activityId: _activityId, activitySetId: _activitySetId);
       if(result is ActionResultSuccess) {
         _apiStatus = ApiStatus.success;
       } else {
@@ -50,30 +54,53 @@ class TaskProvider extends ChangeNotifier {
     } catch(e) {
       _apiStatus = ApiStatus.failure;
     } finally {
-      notifyListeners();
+      if (!_isDisposed) notifyListeners();
     }
   }
 
   DateTime get selectedDate => _selectedDate;
 
-  void setSelectedDate(DateTime date) {
+  Future<void> setSelectedDate(DateTime date) async {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
     _selectedDate = date;
     notifyListeners();
-    if(_allTasks.isNotEmpty) {
-      updateActivityCompletion(_allTasks);
+    if (_allTasks.isNotEmpty) {
+      await updateActivityCompletion(_allTasks);
     }
-    getTodayActivities(date: date);
+    await getTodayActivities(date: date);
   }
 
   List<PatientTaskModel> get tasks {
     return _allTasks;
   }
 
-  void toggleTaskCompletion(String activityId, bool isCompleted) async {
+  void toggleTaskCompletion(String activityId, bool isCompleted) {
     _allTasks = _allTasks.map(
       (task) => task.activityId == activityId ? task.copyWith(isCompleted: isCompleted) : task)
       .toList();
     notifyListeners();
+
+    _debounceTimer?.cancel();
+    final snapshot = List<PatientTaskModel>.from(_allTasks);
+    _debounceTimer = Timer(const Duration(milliseconds: 1500), () {
+      unawaited(updateActivityCompletion(snapshot));
+    });
+  }
+
+  Future<void> saveAndFlush() async {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+    if (_allTasks.isNotEmpty) {
+      await updateActivityCompletion(_allTasks);
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 
   int get completedTasksCount => tasks.where((task) => task.isCompleted ?? false).length;
