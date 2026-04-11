@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +45,7 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      context.read<TaskProvider>().saveAndFlush();
+      unawaited(context.read<TaskProvider>().saveAndFlush());
     }
   }
 

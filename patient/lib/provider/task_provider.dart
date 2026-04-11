@@ -59,7 +59,9 @@ class TaskProvider extends ChangeNotifier {
 
   DateTime get selectedDate => _selectedDate;
 
-  void setSelectedDate(DateTime date) async {
+  Future<void> setSelectedDate(DateTime date) async {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
     _selectedDate = date;
     notifyListeners();
     if (_allTasks.isNotEmpty) {
@@ -79,8 +81,9 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
 
     _debounceTimer?.cancel();
+    final snapshot = List<PatientTaskModel>.from(_allTasks);
     _debounceTimer = Timer(const Duration(milliseconds: 1500), () {
-      updateActivityCompletion(_allTasks);
+      unawaited(updateActivityCompletion(snapshot));
     });
   }
 
@@ -94,7 +97,10 @@ class TaskProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
+    if (_debounceTimer?.isActive ?? false) {
+      _debounceTimer?.cancel();
+      unawaited(updateActivityCompletion(_allTasks));
+    }
     super.dispose();
   }
 
