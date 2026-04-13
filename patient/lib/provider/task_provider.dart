@@ -40,9 +40,13 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateActivityCompletion(List<PatientTaskModel> tasks) async {
+  Future<void> updateActivityCompletion() async {
     try {
-      final result = await _patientRepository.updateActivityCompletion(tasks: _allTasks, activityId: _activityId, activitySetId: _activitySetId);
+      final result = await _patientRepository.updateActivityCompletion(
+        tasks: _allTasks,
+        activityId: _activityId,
+        activitySetId: _activitySetId,
+      );
       if(result is ActionResultSuccess) {
         _apiStatus = ApiStatus.success;
       } else {
@@ -61,7 +65,7 @@ class TaskProvider extends ChangeNotifier {
     _selectedDate = date;
     notifyListeners();
     if(_allTasks.isNotEmpty) {
-      updateActivityCompletion(_allTasks);
+      updateActivityCompletion();
     }
     getTodayActivities(date: date);
   }
@@ -80,12 +84,12 @@ class TaskProvider extends ChangeNotifier {
   /// Updates activity completion status in the background (typically before navigation)
   /// This method syncs the current task completion status to the backend
   Future<void> updateActivityInBackground() async {
-    if (_allTasks.isEmpty) {
+    if (_allTasks.isEmpty || _syncStatus == ApiStatus.loading) {
       return;
     }
     _syncStatus = ApiStatus.loading;
     notifyListeners();
-    await updateActivityCompletion(_allTasks);
+    await updateActivityCompletion();
     // updateActivityCompletion sets _apiStatus, copy it to _syncStatus
     _syncStatus = _apiStatus;
     notifyListeners();
