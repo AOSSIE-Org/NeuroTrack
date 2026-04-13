@@ -182,24 +182,31 @@ class TherapistDataProvider extends ChangeNotifier {
   Future<void> fetchTotals() async {
     _isLoading = true;
     notifyListeners();
+    try {
+      final results = await Future.wait([
+        _therapistRepository.getTotalPatients(),
+        _therapistRepository.getTotalSessions(),
+        _therapistRepository.getTotalTherapies(),
+      ]);
 
-    final patientsResult = await _therapistRepository.getTotalPatients();
-    if (patientsResult is ActionResultSuccess) {
-      _totalPatients = patientsResult.data as int;
+      final patientsResult = results[0];
+      if (patientsResult is ActionResultSuccess) {
+        _totalPatients = (patientsResult.data as num?)?.toInt() ?? 0;
+      }
+
+      final sessionsResult = results[1];
+      if (sessionsResult is ActionResultSuccess) {
+        _totalSessions = (sessionsResult.data as num?)?.toInt() ?? 0;
+      }
+
+      final therapiesResult = results[2];
+      if (therapiesResult is ActionResultSuccess) {
+        _totalTherapies = (therapiesResult.data as num?)?.toInt() ?? 0;
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-
-    final sessionsResult = await _therapistRepository.getTotalSessions();
-    if (sessionsResult is ActionResultSuccess) {
-      _totalSessions = sessionsResult.data as int;
-    }
-
-    final therapiesResult = await _therapistRepository.getTotalTherapies();
-    if (therapiesResult is ActionResultSuccess) {
-      _totalTherapies = therapiesResult.data as int;
-    }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   // Set selected profession and fetch related data

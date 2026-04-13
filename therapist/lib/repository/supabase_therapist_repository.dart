@@ -167,7 +167,11 @@ class SupabaseTherapistRepository implements TherapistRepository {
           .eq('therapist_id', _supabaseClient.auth.currentUser!.id);
 
       final count = response is List
-          ? (response.map((e) => e['therapy_type_id']).toSet().length)
+          ? response
+              .map((e) => e['therapy_type_id'])
+              .where((id) => id != null)
+              .toSet()
+              .length
           : 0;
       return ActionResultSuccess(data: count, statusCode: 200);
     } catch (e) {

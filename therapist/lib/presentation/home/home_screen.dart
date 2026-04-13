@@ -214,47 +214,9 @@ class HomeContent extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  StatsCard(
-                    imagePath: 'assets/icon1.png',
-                    backgroundColor: Color(0xFFFEE8E8),
-                    label: 'Patients',
-                    value: '02',
-                  ),
-                  StatsCard(
-                    imagePath: 'assets/icon2.png',
-                    backgroundColor: Color(0xFFF1E8FE),
-                    label: 'Sessions',
-                    value: '20',
-                  ),
-                  StatsCard(
-                    imagePath: 'assets/icon3.png',
-                    backgroundColor: Color(0xFFE8FEF0),
-                    label: 'Therapies',
-                    value: '13',
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Consumer2<TherapistDataProvider, SessionProvider>(
-              builder: (context, therapistProvider, sessionProvider, _) {
-                if (therapistProvider.isLoading || sessionProvider.isLoading) {
+            Consumer<TherapistDataProvider>(
+              builder: (context, therapistProvider, _) {
+                if (therapistProvider.isLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
@@ -284,7 +246,7 @@ class HomeContent extends StatelessWidget {
                         imagePath: 'assets/icon2.png',
                         backgroundColor: const Color(0xFFF1E8FE),
                         label: 'Sessions',
-                        value: sessionProvider.totalSessions.toString(),
+                        value: therapistProvider.totalSessions.toString(),
                       ),
                       StatsCard(
                         imagePath: 'assets/icon3.png',
