@@ -31,7 +31,7 @@ class PatientScheduleAppointmentModel
       patientId: patientId,
       therapistId: therapistId,
       serviceType: serviceType,
-      timestamp: DateTime.parse(date),
+      timestamp: DateTime.parse(date).toLocal(),
       mode: 1,
       duration: 30,
       appointmentName: appointmentName,

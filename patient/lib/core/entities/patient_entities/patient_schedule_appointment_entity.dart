@@ -50,7 +50,7 @@ class PatientScheduleAppointmentEntity with PatientScheduleAppointmentEntityMapp
       duration: duration,
       isConsultation: false,
       status: 'pending',
-      name: serviceType,
+      name: appointmentName,
     );
   }
 

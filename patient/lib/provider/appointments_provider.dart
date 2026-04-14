@@ -29,6 +29,9 @@ class AppointmentsProvider extends ChangeNotifier {
   String _selectedService = 'Consultation';
   DateTime? _selectedDate;
   String _selectedTimeSlot = '';
+  String _therapistId = '';
+  bool _isSubmitting = false;
+  String? _bookingError;
 
   // Getters
   List<String> get serviceTypes => _serviceTypes;
@@ -39,6 +42,9 @@ class AppointmentsProvider extends ChangeNotifier {
   bool get hasAppointments => _appointments.isNotEmpty;
   List<String> get availableTimeSlots => _availableTimeSlots;
   bool get isFetchingSlots => _isFetchingSlots;
+  bool get isSubmitting => _isSubmitting;
+  String? get bookingError => _bookingError;
+  String get therapistId => _therapistId;
  // List<Map<String, dynamic>> get timeSlots => List.unmodifiable(_timeSlots);
 
 
@@ -126,6 +132,8 @@ class AppointmentsProvider extends ChangeNotifier {
 
       final result = await _authRepository.getAvailableBookingSlotsForTherapist(
         therapistId, date, startTime, endTime);
+      _therapistId = therapistId ?? '';
+      notifyListeners();
 
       if (token != _fetchToken) return;
 
@@ -174,28 +182,65 @@ class AppointmentsProvider extends ChangeNotifier {
 
   /// Creates a new appointment and resets selection. Future: Save to Supabase.
   Future<bool> createAppointment() async {
+    if (_isSubmitting) return false;
+
+    _bookingError = null;
+
+    if (_selectedDate == null) {
+      _bookingError = 'Please select a date before booking.';
+      notifyListeners();
+      return false;
+    }
+
+    if (_selectedTimeSlot.isEmpty) {
+      _bookingError = 'Please select a time slot before booking.';
+      notifyListeners();
+      return false;
+    }
+
+    if (_therapistId.isEmpty) {
+      _bookingError = 'No therapist assigned. Please contact support.';
+      notifyListeners();
+      return false;
+    }
+
+    _isSubmitting = true;
+    notifyListeners();
+
     try {
-      final appointmentModel = PatientScheduleAppointmentModel(
-        patientId: Supabase.instance.client.auth.currentUser!.id,
-        therapistId: '', 
-        serviceType: _selectedService, 
-        date: _selectedDate!.toIso8601String(),
-        slot: _selectedTimeSlot, 
-        appointmentName: 'Appointment with the Therapist'
-      );
+      final slotDateTime = _parseSlotToDateTime(_selectedTimeSlot, _selectedDate!);
 
-      final result = await _authRepository.bookConsultation(appointmentModel.toEntity().toConsultationRequestEntity());
-
-
-      if(result is ActionResultSuccess) {
-        return true;
-      } else {
+      if (slotDateTime == null) {
+        _bookingError = 'Selected time slot is invalid. Please choose another slot.';
         return false;
       }
-    } catch(e) {
+
+      final appointmentModel = PatientScheduleAppointmentModel(
+        patientId: Supabase.instance.client.auth.currentUser!.id,
+        therapistId: _therapistId,
+        serviceType: _selectedService,
+        date: slotDateTime.toIso8601String(),
+        slot: _selectedTimeSlot,
+        appointmentName: 'Appointment with the Therapist',
+      );
+
+      final result = await _authRepository.bookConsultation(
+        appointmentModel.toEntity().toConsultationRequestEntity(),
+      );
+
+      if (result is ActionResultSuccess) {
+        _bookingError = null;
+        return true;
+      } else {
+        _bookingError = 'Booking failed. Please try again.';
+        return false;
+      }
+    } catch (e) {
+      _bookingError = 'An unexpected error occurred. Please try again.';
       print(e);
       return false;
     } finally {
+      _isSubmitting = false;
       fetchAllAppointments();
       notifyListeners();
     }
@@ -224,6 +269,32 @@ class AppointmentsProvider extends ChangeNotifier {
     _selectedService = 'Consultation';
     _selectedDate = null;
     _selectedTimeSlot = '';
+    _therapistId = '';
+    _isSubmitting = false;
+    _bookingError = null;
     notifyListeners();
+  }
+  DateTime? _parseSlotToDateTime(String slot, DateTime date) {
+    try {
+      final trimmed = slot.trim();
+      if (trimmed.isEmpty) return null;
+      final parts = trimmed.split(' ');
+      final timeParts = parts[0].split(':');
+      if (timeParts.length < 2) return null;
+      final parsedHour = int.tryParse(timeParts[0]);
+      final parsedMinute = int.tryParse(timeParts[1]);
+      if (parsedHour == null || parsedMinute == null) return null;
+      if (parsedHour < 0 || parsedHour > 23) return null;
+      if (parsedMinute < 0 || parsedMinute > 59) return null;
+      int hour = parsedHour;
+      final minute = parsedMinute;
+      final isPM = parts.length > 1 && parts[1].toUpperCase() == 'PM';
+      final isAM = parts.length > 1 && parts[1].toUpperCase() == 'AM';
+      if (isPM && hour != 12) hour += 12;
+      if (isAM && hour == 12) hour = 0;
+      return DateTime(date.year, date.month, date.day, hour, minute);
+    } catch (_) {
+      return null;
+    }
   }
 }
