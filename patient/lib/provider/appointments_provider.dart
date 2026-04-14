@@ -85,6 +85,7 @@ class AppointmentsProvider extends ChangeNotifier {
       final supabase = Supabase.instance.client;
       final currentUser = supabase.auth.currentUser;
       if (currentUser == null) {
+        _therapistId = '';
         availableTimeSlots = [];
         return;
       }
@@ -115,6 +116,7 @@ class AppointmentsProvider extends ChangeNotifier {
       }
 
       if (therapistId == null || therapistId.isEmpty) {
+        _therapistId = '';
         availableTimeSlots = [];
         return;
       }
@@ -145,6 +147,7 @@ class AppointmentsProvider extends ChangeNotifier {
     } catch(e) {
       print(e);
       if (token == _fetchToken) {
+        _therapistId = '';
         availableTimeSlots = [];
       }
     } finally {
@@ -200,6 +203,12 @@ class AppointmentsProvider extends ChangeNotifier {
 
     if (_isFetchingSlots) {
       _bookingError = 'Please wait while available slots are loading.';
+      notifyListeners();
+      return false;
+    }
+
+    if (!_availableTimeSlots.contains(_selectedTimeSlot)) {
+      _bookingError = 'Selected time slot is no longer available. Please choose another slot.';
       notifyListeners();
       return false;
     }
