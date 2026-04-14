@@ -132,10 +132,10 @@ class AppointmentsProvider extends ChangeNotifier {
 
       final result = await _authRepository.getAvailableBookingSlotsForTherapist(
         therapistId, date, startTime, endTime);
+      if (token != _fetchToken) return;
+
       _therapistId = therapistId ?? '';
       notifyListeners();
-
-      if (token != _fetchToken) return;
 
       if(result is ActionResultSuccess) {
         availableTimeSlots = result.data as List<String>;
@@ -198,6 +198,12 @@ class AppointmentsProvider extends ChangeNotifier {
       return false;
     }
 
+    if (_isFetchingSlots) {
+      _bookingError = 'Please wait while available slots are loading.';
+      notifyListeners();
+      return false;
+    }
+
     if (_therapistId.isEmpty) {
       _bookingError = 'No therapist assigned. Please contact support.';
       notifyListeners();
@@ -231,6 +237,11 @@ class AppointmentsProvider extends ChangeNotifier {
       if (result is ActionResultSuccess) {
         _bookingError = null;
         return true;
+      } else if (result is ActionResultFailure) {
+        _bookingError = (result.errorMessage?.isNotEmpty == true)
+            ? result.errorMessage
+            : 'Booking failed. Please try again.';
+        return false;
       } else {
         _bookingError = 'Booking failed. Please try again.';
         return false;
@@ -278,20 +289,26 @@ class AppointmentsProvider extends ChangeNotifier {
     try {
       final trimmed = slot.trim();
       if (trimmed.isEmpty) return null;
-      final parts = trimmed.split(' ');
+      final parts = trimmed.split(RegExp(r'\s+'));
+      if (parts.isEmpty || parts.length > 2) return null;
       final timeParts = parts[0].split(':');
-      if (timeParts.length < 2) return null;
+      if (timeParts.length != 2) return null;
       final parsedHour = int.tryParse(timeParts[0]);
       final parsedMinute = int.tryParse(timeParts[1]);
       if (parsedHour == null || parsedMinute == null) return null;
-      if (parsedHour < 0 || parsedHour > 23) return null;
       if (parsedMinute < 0 || parsedMinute > 59) return null;
+      final period = parts.length == 2 ? parts[1].toUpperCase() : null;
+      final hasPeriod = period != null;
+      if (hasPeriod && period != 'AM' && period != 'PM') return null;
       int hour = parsedHour;
       final minute = parsedMinute;
-      final isPM = parts.length > 1 && parts[1].toUpperCase() == 'PM';
-      final isAM = parts.length > 1 && parts[1].toUpperCase() == 'AM';
-      if (isPM && hour != 12) hour += 12;
-      if (isAM && hour == 12) hour = 0;
+      if (hasPeriod) {
+        if (hour < 1 || hour > 12) return null;
+        if (period == 'PM' && hour != 12) hour += 12;
+        if (period == 'AM' && hour == 12) hour = 0;
+      } else {
+        if (hour < 0 || hour > 23) return null;
+      }
       return DateTime(date.year, date.month, date.day, hour, minute);
     } catch (_) {
       return null;
