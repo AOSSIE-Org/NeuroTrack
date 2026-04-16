@@ -2,6 +2,7 @@ import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/core.dart';
 import '../../core/theme/theme.dart';
 import '../../provider/task_provider.dart';
 
@@ -55,18 +56,32 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daily Activities'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () {
-           // context.read<TaskProvider>().updateActivityInBackground(); // TODO: Uncomment this when the backend is ready
-            Navigator.pop(context);
-          },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final taskProvider = context.read<TaskProvider>();
+        await taskProvider.updateActivityInBackground();
+        if (taskProvider.syncStatus == ApiStatus.failure && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to save your progress'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+        if (mounted) Navigator.pop(context);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Daily Activities'),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: () => Navigator.maybePop(context),
+          ),
         ),
-      ),
       body: Consumer<TaskProvider>(
         builder: (context, taskProvider, child) {
           final tasks = taskProvider.tasks;
@@ -228,6 +243,7 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
             ],
           );
         },
+      ),
       ),
     );
   }
