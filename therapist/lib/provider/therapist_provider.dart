@@ -15,6 +15,10 @@ class TherapistDataProvider extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  bool _isTotalsLoading = false;
+  bool get isTotalsLoading => _isTotalsLoading;
+  bool _isPatientsLoading = false;
+  bool get isPatientsLoading => _isPatientsLoading;
 
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
@@ -152,6 +156,15 @@ class TherapistDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  int _totalPatients = 0;
+  int get totalPatients => _totalPatients;
+
+  int _totalSessions = 0;
+  int get totalSessions => _totalSessions;
+
+  int _totalTherapies = 0;
+  int get totalTherapies => _totalTherapies;
+
   // Fetch therapies based on selected profession
   Future<void> fetchTherapies(int professionId) async {
     _isLoading = true;
@@ -168,6 +181,36 @@ class TherapistDataProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> fetchTotals() async {
+    _isTotalsLoading = true;
+    notifyListeners();
+    try {
+      final results = await Future.wait([
+        _therapistRepository.getTotalPatients(),
+        _therapistRepository.getTotalSessions(),
+        _therapistRepository.getTotalTherapies(),
+      ]);
+
+      final patientsResult = results[0];
+      if (patientsResult is ActionResultSuccess) {
+        _totalPatients = (patientsResult.data as num?)?.toInt() ?? 0;
+      }
+
+      final sessionsResult = results[1];
+      if (sessionsResult is ActionResultSuccess) {
+        _totalSessions = (sessionsResult.data as num?)?.toInt() ?? 0;
+      }
+
+      final therapiesResult = results[2];
+      if (therapiesResult is ActionResultSuccess) {
+        _totalTherapies = (therapiesResult.data as num?)?.toInt() ?? 0;
+      }
+    } finally {
+      _isTotalsLoading = false;
+      notifyListeners();
+    }
   }
 
   // Set selected profession and fetch related data
@@ -209,19 +252,24 @@ class TherapistDataProvider extends ChangeNotifier {
   }
 
   Future<void> fetchPatientsMappedToTherapist() async {
+    _isPatientsLoading = true;
     _patientsStatus = ApiStatus.loading;
     notifyListeners();
 
-    final result = await _therapistRepository.fetchPatientsMappedToTherapist();
+    try {
+      final result = await _therapistRepository.fetchPatientsMappedToTherapist();
 
-    if(result is ActionResultSuccess) {
-      _patients = result.data;
-      _patientsStatus = ApiStatus.success;
-    } else if(result is ActionResultFailure) {
-      _patients = <TherapistPatientDetailsModel>[];
-      _patientsStatus = ApiStatus.failure;
-      _errorMessage = result.errorMessage!;
+      if(result is ActionResultSuccess) {
+        _patients = result.data;
+        _patientsStatus = ApiStatus.success;
+      } else if(result is ActionResultFailure) {
+        _patients = <TherapistPatientDetailsModel>[];
+        _patientsStatus = ApiStatus.failure;
+        _errorMessage = result.errorMessage!;
+      }
+    } finally {
+      _isPatientsLoading = false;
+      notifyListeners();
     }
-    notifyListeners();
   }
 }
