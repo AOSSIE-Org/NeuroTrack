@@ -15,6 +15,10 @@ class TherapistDataProvider extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  bool _isTotalsLoading = false;
+  bool get isTotalsLoading => _isTotalsLoading;
+  bool _isPatientsLoading = false;
+  bool get isPatientsLoading => _isPatientsLoading;
 
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
@@ -180,7 +184,7 @@ class TherapistDataProvider extends ChangeNotifier {
   }
 
   Future<void> fetchTotals() async {
-    _isLoading = true;
+    _isTotalsLoading = true;
     notifyListeners();
     try {
       final results = await Future.wait([
@@ -204,7 +208,7 @@ class TherapistDataProvider extends ChangeNotifier {
         _totalTherapies = (therapiesResult.data as num?)?.toInt() ?? 0;
       }
     } finally {
-      _isLoading = false;
+      _isTotalsLoading = false;
       notifyListeners();
     }
   }
@@ -248,19 +252,24 @@ class TherapistDataProvider extends ChangeNotifier {
   }
 
   Future<void> fetchPatientsMappedToTherapist() async {
+    _isPatientsLoading = true;
     _patientsStatus = ApiStatus.loading;
     notifyListeners();
 
-    final result = await _therapistRepository.fetchPatientsMappedToTherapist();
+    try {
+      final result = await _therapistRepository.fetchPatientsMappedToTherapist();
 
-    if(result is ActionResultSuccess) {
-      _patients = result.data;
-      _patientsStatus = ApiStatus.success;
-    } else if(result is ActionResultFailure) {
-      _patients = <TherapistPatientDetailsModel>[];
-      _patientsStatus = ApiStatus.failure;
-      _errorMessage = result.errorMessage!;
+      if(result is ActionResultSuccess) {
+        _patients = result.data;
+        _patientsStatus = ApiStatus.success;
+      } else if(result is ActionResultFailure) {
+        _patients = <TherapistPatientDetailsModel>[];
+        _patientsStatus = ApiStatus.failure;
+        _errorMessage = result.errorMessage!;
+      }
+    } finally {
+      _isPatientsLoading = false;
+      notifyListeners();
     }
-    notifyListeners();
   }
 }

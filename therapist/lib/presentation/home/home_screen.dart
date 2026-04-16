@@ -216,7 +216,7 @@ class HomeContent extends StatelessWidget {
           children: [
             Consumer<TherapistDataProvider>(
               builder: (context, therapistProvider, _) {
-                if (therapistProvider.isLoading) {
+                if (therapistProvider.isTotalsLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
 

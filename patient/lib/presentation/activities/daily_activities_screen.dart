@@ -61,17 +61,20 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final taskProvider = context.read<TaskProvider>();
-        await taskProvider.updateActivityInBackground();
-        if (taskProvider.syncStatus == ApiStatus.failure && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to save your progress'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 2),
-            ),
-          );
+        try {
+          await taskProvider.updateActivityInBackground();
+          if (taskProvider.syncStatus == ApiStatus.failure && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to save your progress'),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        } finally {
+          if (mounted) Navigator.pop(context);
         }
-        if (mounted) Navigator.pop(context);
       },
       child: Scaffold(
         appBar: AppBar(
