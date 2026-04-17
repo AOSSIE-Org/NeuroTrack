@@ -60,8 +60,8 @@ class _DailyActivitiesScreenState extends State<DailyActivitiesScreen>
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        await context.read<TaskProvider>().updateActivityInBackground();
         final taskProvider = context.read<TaskProvider>();
+        await taskProvider.updateActivityInBackground();
         if (taskProvider.syncStatus == ApiStatus.failure && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
