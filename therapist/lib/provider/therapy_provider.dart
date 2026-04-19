@@ -219,27 +219,36 @@ class TherapyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void saveTherapyDetails() async {
+  Future<void> saveTherapyDetails() async {
+    if (_saveTherapyStatus.isLoading) return;
+
     _saveTherapyStatus = SaveTherapyStatus.loading;
-    final therapyGoalModel = TherapyGoalModel(
-      performedOn: _selectedDateTime ?? DateTime.now(),
-      therapyTypeId: _getTherapyIdFromSelectedTherapy(),
-      goals: _selectedTherapyGoals,
-      observations: _selectedTherapyObservations,
-      regressions: _selectedTherapyRegressions,
-      activities: _selectedTherapyActivities,
-      patientId: _patientId,
-    );
+    notifyListeners();
 
-    final ActionResult result = await _therapyRepository.saveTherapyGoals(therapyGoalModel.toEntity());
+    try {
+      final therapyGoalModel = TherapyGoalModel(
+        performedOn: _selectedDateTime ?? DateTime.now(),
+        therapyTypeId: _getTherapyIdFromSelectedTherapy(),
+        goals: _selectedTherapyGoals,
+        observations: _selectedTherapyObservations,
+        regressions: _selectedTherapyRegressions,
+        activities: _selectedTherapyActivities,
+        patientId: _patientId,
+      );
 
-    if(result is ActionResultSuccess) {
-      _saveTherapyStatus = SaveTherapyStatus.success;
-      _saveTherapyErrorMessage = '';
-      notifyListeners();
-    } else {
+      final ActionResult result = await _therapyRepository.saveTherapyGoals(therapyGoalModel.toEntity());
+
+      if (result is ActionResultSuccess) {
+        _saveTherapyStatus = SaveTherapyStatus.success;
+        _saveTherapyErrorMessage = '';
+      } else {
+        _saveTherapyStatus = SaveTherapyStatus.failure;
+        _saveTherapyErrorMessage = result.errorMessage.toString();
+      }
+    } catch (e) {
       _saveTherapyStatus = SaveTherapyStatus.failure;
-      _saveTherapyErrorMessage = result.errorMessage.toString();
+      _saveTherapyErrorMessage = e.toString();
+    } finally {
       notifyListeners();
     }
   }

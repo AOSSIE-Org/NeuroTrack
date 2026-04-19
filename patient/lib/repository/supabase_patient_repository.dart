@@ -238,13 +238,16 @@ class SupabasePatientRepository implements PatientRepository {
       .gte('performed_on', startDate.toIso8601String())
       .lte('performed_on', endDate.toIso8601String());
 
+      final Set<String> seenRegressions = {};
       List<String> regressions = [];
       for(var i = 0; i < regresstionResponse.length; i++) {
         final regression = regresstionResponse[i]['regressions'];
         for(var j = 0; j < regression.length; j++) {
           final regressionItem = regression[j] is String ? jsonDecode(regression[j]) : regression[j];
-
-          regressions.add(regressionItem['name']);
+          final String regressionName = regressionItem['name'];
+          if (seenRegressions.add(regressionName)) {
+            regressions.add(regressionName);
+          }
         }
       }
       

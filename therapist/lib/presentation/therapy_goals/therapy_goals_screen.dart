@@ -115,6 +115,7 @@ class _TherapyGoalsScreenState extends State<TherapyGoalsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 25),
         child: SaveTherapyButton(
           text: 'Save Therapy Details',
+          isLoading: therapyProvider.saveTherapyStatus.isLoading,
           onPressed: _onSaveTherapyDetails,
         ),
       ),
